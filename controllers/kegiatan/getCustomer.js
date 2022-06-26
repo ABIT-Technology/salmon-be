@@ -1,0 +1,24 @@
+
+const sequelize = require("../../config/configdb");
+const global = require("../../config/global");
+
+module.exports = {
+    getAll: async (req, res) => {
+        try {
+            const [results, metadata] = await sequelize.query("SELECT * FROM customer");
+            res.json(global.getStandardResponse(0, "success", results));
+        }
+        catch (err) {
+            res.status(500).json(global.getStandardResponse(500, "API error", null));
+        }
+    },
+    getByCustomerName: async (req, res) => {
+        try {
+            const [results, metadata] = await sequelize.query("SELECT * FROM customer WHERE nama like '%" + req.body.nama + "%'");
+            res.json(global.getStandardResponse(0, "success", results));
+        }
+        catch (err) {
+            res.status(500).json(global.getStandardResponse(500, "API error", null));
+        }
+    }
+}
