@@ -18,7 +18,7 @@ module.exports = {
             // to declare some path to store your converted image
             
             const filename = uuidv4.v4();
-            const path = './public/upload/images/' + filename + '.png'
+            const path = './public/upload/images/' + filename + '.jpg'
             const imgdata = images["string"];
 
             // to convert base64 format into random filename

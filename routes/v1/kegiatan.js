@@ -11,6 +11,6 @@ router.get("/getCustomer", kegiatanController.getCustomer.getAll);
 router.post("/getCustomerByName", kegiatanController.getCustomer.getByCustomerName);
 router.post("/SubmitKegiatan", authJwt, kegiatanController.PostKegiatan.SubmitKegiatan);
 router.post("/ViewDetailKegiatan", authJwt, kegiatanController.PostKegiatan.ViewDetailtKegiatan);
-router.post("/UpdateStatusKegiatan", authJwt, kegiatanController.PostKegiatan.FinishKegiatan);
+router.get("/ViewUnfinishedKegiatan", authJwt, kegiatanController.PostKegiatan.ViewUnfinishedKegiatan);
 
 module.exports = router;
