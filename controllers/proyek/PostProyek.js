@@ -23,7 +23,7 @@ module.exports = {
             crops: Joi.array().required(),
             media: Joi.array().required(),
             image: Joi.array().required(),
-            ID3_REF: Joi.string().allow(null, "")
+            ID3_REF: Joi.number().allow(null, "")
         }).options({
             allowUnknown: false,
         });
@@ -240,27 +240,27 @@ module.exports = {
                 });
             }
             let json = [];
-            const results = await sequelize.query("select TOP 1 * from SXT01A where IDK = " + req.user.IDK + " and ID1_REF IS NOT NULL AND ID1_REF != 0 and ID1_REF NOT IN(" +
-                " select distinct ID1_REF" +
-                " from SXT01A " +
-                " where IDK = " + req.user.IDK + " and ID1_REF in ( select ID1 from SXT01A where IDK = " + req.user.IDK + ") " +
-                " and ISNULL(VISIT_ID, '') = ( SELECT TOP 1 VISIT_ID from ref_SXF03 where COY_ID = (select COY_ID from ABF02A where IDK = " + req.user.IDK + "))) ORDER BY ID1 DESC");
+            const results = await sequelize.query("select TOP 1 * from SXT02C where IDK = " + req.user.IDK + " AND ID3_REF NOT IN(" +
+                " select distinct ID3_REF" +
+                " from SXT02C " +
+                " where IDK = " + req.user.IDK + " and ID3_REF in ( select ID3 from SXT02C where IDK = " + req.user.IDK + ") " +
+                " and ISNULL(VISIT_ID, '') = ( SELECT TOP 1 VISIT_ID from ref_SXF03P where COY_ID = (select COY_ID from ABF02A where IDK = " + req.user.IDK + "))) ORDER BY ID3 DESC");
             if (results != null) {
                 json = results;
                 console.log(json);
-                const [results2, metadata2] = await sequelize.query("SELECT * FROM SXT01B WHERE ID1 ='" + json[0][0].ID1 + "'");
+                const [results2, metadata2] = await sequelize.query("SELECT * FROM SXT02D WHERE ID1 ='" + json[0][0].ID3 + "'");
                 if (results2 != null) {
                     json[0].PRODUCT = results2;
                 }
-                const [results3, metadata3] = await sequelize.query("SELECT * FROM SXT01C WHERE ID1 ='" + json[0][0].ID1 + "'");
+                const [results3, metadata3] = await sequelize.query("SELECT * FROM SXT02E WHERE ID1 ='" + json[0][0].ID3 + "'");
                 if (results3 != null) {
                     json[0].MEDIA = results3;
                 }
-                const [results4, metadata4] = await sequelize.query("SELECT * FROM SXT01C WHERE ID1 ='" + json[0][0].ID1 + "'");
+                const [results4, metadata4] = await sequelize.query("SELECT * FROM SXT02F WHERE ID1 ='" + json[0][0].ID3 + "'");
                 if (results4 != null) {
                     json[0].CROPS = results4;
                 }
-                const [results5, metadata5] = await sequelize.query("SELECT * FROM SXT01C WHERE ID1 ='" + json[0][0].ID1 + "'");
+                const [results5, metadata5] = await sequelize.query("SELECT * FROM SXT02G WHERE ID1 ='" + json[0][0].ID3 + "'");
                 if (results5 != null) {
                     json[0].IMAGES = results5;
                 }

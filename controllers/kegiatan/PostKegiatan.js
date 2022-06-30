@@ -220,7 +220,7 @@ module.exports = {
                 });
             }
             let json = [];
-            const results = await sequelize.query("select TOP 1 * from SXT01A where IDK = " + req.user.IDK + " and ID1_REF IS NOT NULL AND ID1_REF != 0 and ID1_REF NOT IN(" +
+            const results = await sequelize.query("select TOP 1 * from SXT01A where IDK = " + req.user.IDK + " and ID1_REF NOT IN(" +
                 " select distinct ID1_REF" +
                 " from SXT01A " +
                 " where IDK = " + req.user.IDK + " and ID1_REF in ( select ID1 from SXT01A where IDK = " + req.user.IDK + ") " +
