@@ -6,7 +6,7 @@ const global = require("../../config/global");
 
 module.exports = async (req, res) => {
     try {
-        const [results, metadata] = await sequelize.query("SELECT * FROM SXF03 WHERE AKTIF = 1 AND PROYEK = 0");
+        const [results, metadata] = await sequelize.query("SELECT * FROM SXF03 WHERE AKTIF = 1 AND KEGIATAN = 1");
         res.json(global.getStandardResponse(0, "success", results));
     }
     catch (err) {
