@@ -4,8 +4,8 @@ const { proyekController } = require("../../controllers");
 const { authJwt } = require("../../middlewares/jwt");
 
 
-router.get("/getKegiatan",proyekController.getKegiatanProyek)
-router.post("/getProyek",proyekController.getProyek.getProyek)
+router.get("/getKegiatan",authJwt,proyekController.getKegiatanProyek)
+router.post("/getProyek",authJwt,proyekController.getProyek.getProyek)
 router.get("/getMasterProyek",authJwt,proyekController.getProyek.getMasterProyek)
 router.post("/SubmitProyek",authJwt,proyekController.PostProyek.SubmitProyek)
 router.post("/ViewDetailProyek",authJwt,proyekController.PostProyek.ViewDetailProyek)

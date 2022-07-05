@@ -3,12 +3,12 @@ const router = express.Router();
 const { kegiatanController } = require("../../controllers");
 const { authJwt } = require("../../middlewares/jwt");
 
-router.get("/getKegiatan", kegiatanController.getKegiatan);
-router.get("/getProduk", kegiatanController.getProduk);
-router.get("/getCrops", kegiatanController.getCrops);
-router.get("/getMedia", kegiatanController.getMedia);
-router.get("/getCustomer", kegiatanController.getCustomer.getAll);
-router.post("/getCustomerByName", kegiatanController.getCustomer.getByCustomerName);
+router.get("/getKegiatan", authJwt, kegiatanController.getKegiatan);
+router.get("/getProduk", authJwt, kegiatanController.getProduk);
+router.get("/getCrops", authJwt, kegiatanController.getCrops);
+router.get("/getMedia", authJwt, kegiatanController.getMedia);
+router.get("/getCustomer", authJwt, kegiatanController.getCustomer.getAll);
+router.post("/getCustomerByName", authJwt, kegiatanController.getCustomer.getByCustomerName);
 router.post("/SubmitKegiatan", authJwt, kegiatanController.PostKegiatan.SubmitKegiatan);
 router.post("/ViewDetailKegiatan", authJwt, kegiatanController.PostKegiatan.ViewDetailtKegiatan);
 router.get("/ViewUnfinishedKegiatan", authJwt, kegiatanController.PostKegiatan.ViewUnfinishedKegiatan);

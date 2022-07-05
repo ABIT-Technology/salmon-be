@@ -5,6 +5,18 @@ const global = require("../../config/global");
 module.exports = {
     getAll: async (req, res) => {
         try {
+            const user = await SBF01A.findOne({
+                where: { IDK: req.user.IDK },
+                raw: true,
+            });
+    
+            if (!user) {
+                return res.status(409).send({
+                    code: 409,
+                    message: "User not authorized",
+                });
+            }
+
             const [results, metadata] = await sequelize.query("SELECT * FROM customer");
             res.json(global.getStandardResponse(0, "success", results));
         }
@@ -14,6 +26,19 @@ module.exports = {
     },
     getByCustomerName: async (req, res) => {
         try {
+
+            const user = await SBF01A.findOne({
+                where: { IDK: req.user.IDK },
+                raw: true,
+            });
+    
+            if (!user) {
+                return res.status(409).send({
+                    code: 409,
+                    message: "User not authorized",
+                });
+            }
+
             const [results, metadata] = await sequelize.query("SELECT * FROM customer WHERE nama like '%" + req.body.nama + "%'");
             res.json(global.getStandardResponse(0, "success", results));
         }

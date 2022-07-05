@@ -194,6 +194,19 @@ module.exports = {
 
     ViewDetailtKegiatan: async (req, res) => {
         try {
+            
+            const user = await SBF01A.findOne({
+                where: { IDK: req.user.IDK },
+                raw: true,
+            });
+    
+            if (!user) {
+                return res.status(409).send({
+                    code: 409,
+                    message: "User not authorized",
+                });
+            }
+
             let json = [];
             const [results, metadata] = await sequelize.query("SELECT * FROM SXT01A WHERE ID1 ='" + req.body.ID1 + "'");
             if (results != null) {
