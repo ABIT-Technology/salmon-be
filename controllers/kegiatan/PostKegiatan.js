@@ -219,11 +219,11 @@ module.exports = {
                 if (results3 != null) {
                     json[0].MEDIA = results3;
                 }
-                const [results4, metadata4] = await sequelize.query("SELECT * FROM SXT01C WHERE ID1 ='" + req.body.ID1 + "'");
+                const [results4, metadata4] = await sequelize.query("SELECT * FROM SXT01D WHERE ID1 ='" + req.body.ID1 + "'");
                 if (results4 != null) {
                     json[0].CROPS = results4;
                 }
-                const [results5, metadata5] = await sequelize.query("SELECT * FROM SXT01C WHERE ID1 ='" + req.body.ID1 + "'");
+                const [results5, metadata5] = await sequelize.query("SELECT * FROM SXT01E WHERE ID1 ='" + req.body.ID1 + "'");
                 if (results5 != null) {
                     json[0].IMAGES = results5;
                 }
