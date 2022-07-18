@@ -15,14 +15,14 @@ module.exports = {
             TGL_INPUT: Joi.string().required(),
             SIGNAL: Joi.number().required(),
             BATTERY: Joi.number().required(),
-            KET: Joi.string().required().allow(null, ""),
-            VISIT_ID: Joi.string().required().allow(null, ""),
+            KET: Joi.string().allow(null, ""),
+            VISIT_ID: Joi.string().allow(null, ""),
             ALTITUDE: Joi.number().required(),
             ACCURATE: Joi.number().required(),
             LOKASI: Joi.string().required(),
-            product: Joi.array().required(),
-            crops: Joi.array().required(),
-            media: Joi.array().required(),
+            product: Joi.array().allow(null, ""),
+            crops: Joi.array().allow(null, ""),
+            media: Joi.array().allow(null, ""),
             image: Joi.array().required(),
             ID3_REF: Joi.number().allow(null, ""),
             STATUS: Joi.boolean().allow(null, "")
@@ -111,10 +111,10 @@ module.exports = {
 
             // save table header transaksi kegiatan
             const sql = "INSERT INTO SXT02C(ID1,IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,COY_ID,VISIT_ID,TYPE,ALTITUDE"
-                + ",ACCURATE,LOKASI,ID3_REF) values(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
+                + ",ACCURATE,LOKASI,ID3_REF,STATUS) values(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
                 + req.user.IDK + "','" + req.body.LAT_ + "','" + req.body.LONG_ + "','" + req.body.COURSE + "','" + req.body.SPEED
-                + "','" + req.body.TGL + "',GETDATE(),'" + req.body.SIGNAL + "','" + req.body.BATTERY + "','"
-                + req.body.KET + "','" + COY_ID + "','" + (VISIT_ID == 0 ? req.body.VISIT_ID : VISIT_ID) + "',0,'" + req.body.ALTITUDE + "','" + req.body.ACCURATE +
+                + "','" + req.body.TGL + "',GETDATE(),'" + req.body.SIGNAL + "','" + req.body.BATTERY + "',"
+                + (req.body.KET == null ? "NULL" : "'" + req.body.KET + "'") + ",'" + COY_ID + "','" + (VISIT_ID == 0 ? req.body.VISIT_ID : VISIT_ID) + "',0,'" + req.body.ALTITUDE + "','" + req.body.ACCURATE +
                 "','" + req.body.LOKASI + "'," + (ID3_REF == null ? "NULL" : ID3_REF) + "," + status + ")";
             let header = await sequelize.query(sql, {
                 type: sequelize.QueryTypes.INSERT,
@@ -138,17 +138,19 @@ module.exports = {
             }).options({
                 allowUnknown: false,
             });
-            for (let i = 0; i < product.length; i++) {
+            if (product != undefined) {
+                for (let i = 0; i < product.length; i++) {
 
-                if (schemaproduct.validate(product[i]).error) {
-                    throw new Error(schemaproduct.validate(product[i]).error);
+                    if (schemaproduct.validate(product[i]).error) {
+                        throw new Error(schemaproduct.validate(product[i]).error);
+                    }
+                    const sqlprod = "INSERT INTO SXT02D(ID1,ID3,BRG,QTY,STN,TGL_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
+                        + headerid + "','" + product[i]["BRG"] + "','" + product[i]["QTY"] + "','"
+                        + product[i]["STN"] + "',GETDATE())";
+                    sequelize.query(sqlprod, {
+                        type: sequelize.QueryTypes.INSERT
+                    });
                 }
-                const sqlprod = "INSERT INTO SXT02D(ID1,ID3,BRG,QTY,STN,TGL_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
-                    + headerid + "','" + product[i]["BRG"] + "','" + product[i]["QTY"] + "','"
-                    + product[i]["STN"] + "',GETDATE())";
-                sequelize.query(sqlprod, {
-                    type: sequelize.QueryTypes.INSERT
-                });
             }
             // end of save product
 
@@ -160,16 +162,18 @@ module.exports = {
             }).options({
                 allowUnknown: false,
             });
-            for (let i = 0; i < media.length; i++) {
-                if (schemamedia.validate(media[i]).error) {
-                    throw new Error(schemamedia.validate(media[i]).error);
+            if (media != undefined) {
+                for (let i = 0; i < media.length; i++) {
+                    if (schemamedia.validate(media[i]).error) {
+                        throw new Error(schemamedia.validate(media[i]).error);
+                    }
+                    const sqlmedia = "INSERT INTO SXT02E(ID1,ID3,MEDIA,QTY,TGL_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
+                        + headerid + "','" + media[i]["MEDIA"] + "','" + media[i]["QTY"] + "',GETDATE())";
+                    sequelize.query(sqlmedia, {
+                        type: sequelize.QueryTypes.INSERT
+                    });
+                    console.log(media[i]["nama"]);
                 }
-                const sqlmedia = "INSERT INTO SXT02E(ID1,ID3,MEDIA,QTY,TGL_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
-                    + headerid + "','" + media[i]["MEDIA"] + "','" + media[i]["QTY"] + "',GETDATE())";
-                sequelize.query(sqlmedia, {
-                    type: sequelize.QueryTypes.INSERT
-                });
-                console.log(media[i]["nama"]);
             }
             // end of media promosi
 
@@ -180,15 +184,17 @@ module.exports = {
             }).options({
                 allowUnknown: false,
             });
-            for (let i = 0; i < crops.length; i++) {
-                if (schemacrops.validate(crops[i]).error) {
-                    throw new Error(schemacrops.validate(crops[i]).error);
+            if (crops != undefined) {
+                for (let i = 0; i < crops.length; i++) {
+                    if (schemacrops.validate(crops[i]).error) {
+                        throw new Error(schemacrops.validate(crops[i]).error);
+                    }
+                    const sqlcrops = "INSERT INTO SXT02F(ID1,ID3,CROPS,TGL_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
+                        + headerid + "','" + crops[i]["CROPS"] + "',GETDATE())";
+                    sequelize.query(sqlcrops, {
+                        type: sequelize.QueryTypes.INSERT
+                    });
                 }
-                const sqlcrops = "INSERT INTO SXT02F(ID1,ID3,CROPS,TGL_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
-                    + headerid + "','" + crops[i]["CROPS"] + "',GETDATE())";
-                sequelize.query(sqlcrops, {
-                    type: sequelize.QueryTypes.INSERT
-                });
             }
             // end of save crops
 
@@ -222,14 +228,14 @@ module.exports = {
                 where: { IDK: req.user.IDK },
                 raw: true,
             });
-    
+
             if (!user) {
                 return res.status(409).send({
                     code: 409,
                     message: "User not authorized",
                 });
             }
-            
+
             let json = [];
             const [results, metadata] = await sequelize.query("SELECT * FROM SXT02C WHERE ID3 ='" + req.body.ID3 + "'");
             if (results != null) {
@@ -278,7 +284,7 @@ module.exports = {
             //     " where IDK = " + req.user.IDK + " and ID3_REF in ( select ID3 from SXT02C where IDK = " + req.user.IDK + ") " +
             //     " and ISNULL(VISIT_ID, '') = ( SELECT TOP 1 VISIT_ID from ref_SXF03P where COY_ID = (select COY_ID from ABF02A where IDK = " + req.user.IDK + "))) ORDER BY ID3 DESC");
             const results = await sequelize.query("select TOP 1 * from SXT02C where IDK = " + req.user.IDK + " AND ISNULL(ID3_REF,ID3) "
-            + "not in ( select ISNULL(ID3_REF,ID3) from SXT02C where status = 1 ) order by ID3 desc")
+                + "not in ( select ISNULL(ID3_REF,ID3) from SXT02C where status = 1 ) order by ID3 desc")
             if (results != null) {
                 json = results;
                 console.log(json);

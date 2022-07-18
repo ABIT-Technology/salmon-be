@@ -16,14 +16,14 @@ module.exports = {
             BATTERY: Joi.number().required(),
             KET: Joi.string().required().allow(null, ""),
             // COY_ID: Joi.string().required().allow(null, ""),
-            VISIT_ID: Joi.string().required().allow(null, ""),
+            VISIT_ID: Joi.string().allow(null, ""),
             ALTITUDE: Joi.number().required(),
             ACCURATE: Joi.number().required(),
-            CUST: Joi.string().required().allow(null, ""),
+            CUST: Joi.string().allow(null, ""),
             LOKASI: Joi.string().required(),
-            product: Joi.array().required(),
-            crops: Joi.array().required(),
-            media: Joi.array().required(),
+            product: Joi.array().allow(null, ""),
+            crops: Joi.array().allow(null, ""),
+            media: Joi.array().allow(null, ""),
             image: Joi.array().required(),
             ID1_REF: Joi.string().allow(null, ""),
             STATUS: Joi.boolean().allow(null, "")
@@ -90,13 +90,13 @@ module.exports = {
             const sql = "INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,COY_ID,VISIT_ID,TYPE,ALTITUDE"
                 + ",ACCURATE,CUST,LOKASI,ID1_REF,STATUS) values('"
                 + req.user.IDK + "','" + req.body.LAT_ + "','" + req.body.LONG_ + "','" + req.body.COURSE + "','" + req.body.SPEED
-                + "','" + req.body.TGL + "',GETDATE(),'" + req.body.SIGNAL + "','" + req.body.BATTERY + "','"
-                + req.body.KET + "','" + COY_ID + "','" + (VISIT_ID == 0 ? req.body.VISIT_ID : VISIT_ID) + "',0,'" + req.body.ALTITUDE + "','" + req.body.ACCURATE + "','"
-                + req.body.CUST + "','" + req.body.LOKASI + "'," + (ID1_REF == null ? "NULL" : ID1_REF) + "," + status + ")";
+                + "','" + req.body.TGL + "',GETDATE(),'" + req.body.SIGNAL + "','" + req.body.BATTERY + "',"
+                + (req.body.KET == null ? "NULL" : "'" + req.body.KET + "'") + ",'" + COY_ID + "','" + (VISIT_ID == 0 ? req.body.VISIT_ID : VISIT_ID) + "',0,'" + req.body.ALTITUDE + "','" + req.body.ACCURATE + "',"
+                + (req.body.CUST == null ? "NULL" : "'" + req.body.CUST + "'") + ",'" + req.body.LOKASI + "'," + ((ID1_REF == null || ID1_REF == "") ? "NULL" : ID1_REF) + "," + status + ")";
             let header = await sequelize.query(sql, {
                 type: sequelize.QueryTypes.INSERT,
             }).then(function () {
-                const results2 = sequelize.query("SELECT TOP 1 * FROM SXT01A ORDER BY ID1 DESC");
+                const results2 = sequelize.query("SELECT TOP 1 * FROM SXT01A WHERE IDK = '" + req.user.IDK + "' ORDER BY ID1 DESC");
                 if (results2 != null) {
                     return results2;
                     // console.log(results2);
@@ -115,17 +115,19 @@ module.exports = {
             }).options({
                 allowUnknown: false,
             });
-            for (let i = 0; i < product.length; i++) {
+            if (product !== undefined) {
+                for (let i = 0; i < product.length; i++) {
 
-                if (schemaproduct.validate(product[i]).error) {
-                    throw new Error(schemaproduct.validate(product[i]).error);
+                    if (schemaproduct.validate(product[i]).error) {
+                        throw new Error(schemaproduct.validate(product[i]).error);
+                    }
+                    const sqlprod = "INSERT INTO SXT01B(ID1,BRG,QTY,STN,TGL_INPUT) VALUES('"
+                        + headerid + "','" + product[i]["BRG"] + "','" + product[i]["QTY"] + "','"
+                        + product[i]["STN"] + "',GETDATE())";
+                    sequelize.query(sqlprod, {
+                        type: sequelize.QueryTypes.INSERT
+                    });
                 }
-                const sqlprod = "INSERT INTO SXT01B(ID1,BRG,QTY,STN,TGL_INPUT) VALUES('"
-                    + headerid + "','" + product[i]["BRG"] + "','" + product[i]["QTY"] + "','"
-                    + product[i]["STN"] + "',GETDATE())";
-                sequelize.query(sqlprod, {
-                    type: sequelize.QueryTypes.INSERT
-                });
             }
             // end of save product
 
@@ -137,6 +139,7 @@ module.exports = {
             }).options({
                 allowUnknown: false,
             });
+            if (media !== undefined) {
             for (let i = 0; i < media.length; i++) {
                 if (schemamedia.validate(media[i]).error) {
                     throw new Error(schemamedia.validate(media[i]).error);
@@ -148,6 +151,7 @@ module.exports = {
                 });
                 console.log(media[i]["nama"]);
             }
+        }
             // end of media promosi
 
             // save crops
@@ -157,6 +161,7 @@ module.exports = {
             }).options({
                 allowUnknown: false,
             });
+            if (crops !== undefined) {
             for (let i = 0; i < crops.length; i++) {
                 if (schemacrops.validate(crops[i]).error) {
                     throw new Error(schemacrops.validate(crops[i]).error);
@@ -167,6 +172,7 @@ module.exports = {
                     type: sequelize.QueryTypes.INSERT
                 });
             }
+        }
             // end of save crops
 
             // save image
@@ -194,12 +200,12 @@ module.exports = {
 
     ViewDetailtKegiatan: async (req, res) => {
         try {
-            
+
             const user = await SBF01A.findOne({
                 where: { IDK: req.user.IDK },
                 raw: true,
             });
-    
+
             if (!user) {
                 return res.status(409).send({
                     code: 409,
@@ -255,7 +261,7 @@ module.exports = {
             //     " where IDK = " + req.user.IDK + " and ID1_REF in ( select ID1 from SXT01A where IDK = " + req.user.IDK + ") " +
             //     " and ISNULL(VISIT_ID, '') = ( SELECT TOP 1 VISIT_ID from ref_SXF03 where COY_ID = (select COY_ID from ABF02A where IDK = " + req.user.IDK + "))) ORDER BY ID1 DESC");
             const results = await sequelize.query("select TOP 1 * from SXT01A where IDK = " + req.user.IDK + " AND ISNULL(ID1_REF,ID1) "
-            + "not in ( select ISNULL(ID1_REF,ID1) from SXT01A where status = 1 ) order by ID1 desc")
+                + "not in ( select ISNULL(ID1_REF,ID1) from SXT01A where status = 1 ) order by ID1 desc")
             if (results != null) {
                 json = results;
                 const [results2, metadata2] = await sequelize.query("SELECT * FROM SXT01B WHERE ID1 ='" + json[0][0].ID1 + "'");
