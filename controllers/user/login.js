@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { SBF01A } = require("../../models");
+const { SBF01A, LOGINSALMON2, LOGINHISTORY } = require("../../models");
 const { createJWTToken } = require("../../middlewares/jwt");
 const { JWT_ACCESS_TOKEN_SECRET } = process.env;
 
@@ -7,6 +7,16 @@ module.exports = async (req, res) => {
 	const schema = Joi.object({
 		DEVICE_ID: Joi.string().required(),
 		ACC_NO: Joi.string().required(),
+		LAT_: Joi.number().required(),
+		LONG_: Joi.number().required(),
+		COURSE: Joi.number().required(),
+		SPEED: Joi.number().required(),
+		TGL: Joi.string().required(),
+		SIGNAL: Joi.number().required().allow(null, ""),
+		BATTERY: Joi.number().required(),
+		ALTITUDE: Joi.number().required(),
+		ACCURATE: Joi.number().required(),
+		LOKASI: Joi.string().required(),
 	}).options({
 		allowUnknown: false,
 	});
@@ -20,13 +30,29 @@ module.exports = async (req, res) => {
 		});
 	}
 
+	const {
+		DEVICE_ID,
+		ACC_NO,
+		LAT_,
+		LONG_,
+		COURSE,
+		SPEED,
+		TGL,
+		SIGNAL,
+		BATTERY,
+		ALTITUDE,
+		ACCURATE,
+		LOKASI,
+	} = req.body;
+
 	try {
 		const user = await SBF01A.findOne({
 			where: {
-				ACC_NO: req.body.ACC_NO,
-				DEVICE_ID: req.body.DEVICE_ID,
+				ACC_NO,
+				DEVICE_ID,
 				AKTIF: 1,
 			},
+			raw: true,
 		});
 
 		if (!user) {
@@ -35,6 +61,32 @@ module.exports = async (req, res) => {
 				message: "User not found",
 			});
 		}
+
+		await LOGINSALMON2.create({
+			DEVICE_ID,
+			ACC_NO,
+			LAT_,
+			LONG_,
+			COURSE,
+			SPEED,
+			TGL,
+			SIGNAL,
+			BATTERY,
+			ALTITUDE,
+			ACCURATE,
+			LOKASI,
+			IDK: user.IDK,
+		});
+
+		await LOGINHISTORY.update(
+			{
+				TGL_UPDATE: new Date(),
+				KET: "success",
+			},
+			{
+				where: { ID1: req.logger.ID1 },
+			},
+		);
 
 		const accessToken = createJWTToken(
 			{ IDK: user.IDK },
@@ -50,6 +102,9 @@ module.exports = async (req, res) => {
 			},
 		});
 	} catch (err) {
-		console.log(err);
+		res.status(400).send({
+			code: 400,
+			message: err.message || "Server API Error",
+		});
 	}
 };
