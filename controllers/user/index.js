@@ -3,6 +3,7 @@ const create = require("./create");
 const details = require("./details");
 const checkActiveStatus = require("./checkActiveStatus");
 const getAll = require("./getAll");
+const getProfile = require("./getProfile");
 
 module.exports = {
 	login,
@@ -10,4 +11,5 @@ module.exports = {
 	details,
 	checkActiveStatus,
 	getAll,
+	getProfile,
 };

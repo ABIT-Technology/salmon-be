@@ -1,7 +1,7 @@
 
 const sequelize = require("../../config/configdb");
 const global = require("../../config/global");
-
+const { SBF01A } = require("../../models");
 module.exports = {
     getAll: async (req, res) => {
         try {
