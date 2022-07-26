@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
             });
         }
 
-        const [results, metadata] = await sequelize.query("SELECT * FROM produk WHERE active = 1");
+        const [results, metadata] = await sequelize.query("SELECT * FROM vwSTF02");
         res.json(global.getStandardResponse(0, "success", results));
     }
     catch (err) {

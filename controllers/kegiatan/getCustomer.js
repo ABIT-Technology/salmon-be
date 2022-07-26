@@ -17,7 +17,7 @@ module.exports = {
                 });
             }
 
-            const [results, metadata] = await sequelize.query("SELECT * FROM customer");
+            const [results, metadata] = await sequelize.query("SELECT * FROM vwARF01");
             res.json(global.getStandardResponse(0, "success", results));
         }
         catch (err) {
@@ -39,7 +39,7 @@ module.exports = {
                 });
             }
 
-            const [results, metadata] = await sequelize.query("SELECT * FROM customer WHERE nama like '%" + req.body.nama + "%'");
+            const [results, metadata] = await sequelize.query("SELECT * FROM vwARF01 WHERE nama like '%" + req.body.nama + "%'");
             res.json(global.getStandardResponse(0, "success", results));
         }
         catch (err) {
