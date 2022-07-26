@@ -1,0 +1,41 @@
+const Joi = require("joi");
+const { LOGINHISTORY } = require("../models");
+
+module.exports = {
+	login: async (req, res, next) => {
+		try {
+			const schema = Joi.object({
+				DEVICE_ID: Joi.string().required(),
+				ACC_NO: Joi.string().required(),
+				TGL: Joi.string().required(),
+			}).options({
+				allowUnknown: true,
+			});
+
+			const validate = schema.validate(req.body);
+
+			if (validate.error) {
+				return res.status(400).send({
+					code: 400,
+					message: validate.error.message,
+				});
+			}
+			const { DEVICE_ID, ACC_NO, TGL } = req.body;
+			const logger = await LOGINHISTORY.create({
+				DEVICE_ID,
+				ACC_NO,
+				TGL: new Date(TGL),
+				KET: "pending",
+				TYPE: "login",
+			});
+			console.log(logger);
+			req.logger = logger;
+			return next();
+		} catch (err) {
+			return res.status(400).send({
+				code: 400,
+				message: err.message || "Server error",
+			});
+		}
+	},
+};

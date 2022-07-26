@@ -38,6 +38,9 @@ module.exports = async (req, res) => {
 			data: attendance,
 		});
 	} catch (err) {
-		console.log(err);
+		res.status(400).send({
+			code: 400,
+			message: err.message || "Server API Error",
+		});
 	}
 };
