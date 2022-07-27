@@ -9,7 +9,7 @@ module.exports = {
                 where: { IDK: req.user.IDK },
                 raw: true,
             });
-    
+
             if (!user) {
                 return res.status(409).send({
                     code: 409,
@@ -31,7 +31,7 @@ module.exports = {
                 where: { IDK: req.user.IDK },
                 raw: true,
             });
-    
+
             if (!user) {
                 return res.status(409).send({
                     code: 409,
@@ -39,7 +39,15 @@ module.exports = {
                 });
             }
 
-            const [results, metadata] = await sequelize.query("SELECT * FROM vwARF01 WHERE nama like '%" + req.body.nama + "%'");
+            // GET COY_ID from current login user
+            let COY_ID = '0';
+
+            const results2 = await sequelize.query("SELECT TOP 1 * FROM ABF02A WHERE AKTIF = 1 AND IDK='" + req.user.IDK + "'");
+            if (results2 != null) {
+                COY_ID = results2[0][0]['COY_ID'];
+            }
+
+            const [results, metadata] = await sequelize.query("SELECT * FROM vwARF01 WHERE nama like '%" + req.body.nama + "%' AND COY_ID = '" + COY_ID + "'");
             res.json(global.getStandardResponse(0, "success", results));
         }
         catch (err) {
