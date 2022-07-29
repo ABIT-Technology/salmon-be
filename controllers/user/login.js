@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
 		BATTERY: Joi.number().required(),
 		ALTITUDE: Joi.number().required(),
 		ACCURATE: Joi.number().required(),
-		LOKASI: Joi.string().required(),
+		LOKASI: Joi.string().required().allow(null, ""),
 	}).options({
 		allowUnknown: false,
 	});

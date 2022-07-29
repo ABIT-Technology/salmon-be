@@ -1,6 +1,6 @@
 const Joi = require("joi");
 const { Op } = require("sequelize");
-const { ABF27B } = require("../../models");
+const { SXT05 } = require("../../models");
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
 	}
 
 	try {
-		const attendance = await ABF27B.findAll({
+		const attendance = await SXT05.findAll({
 			where: {
 				IDK: req.user.IDK,
 				TGL: {

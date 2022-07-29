@@ -1,14 +1,22 @@
 const Joi = require("joi");
-const { SBF01A, ABF27B, ABF27C, sequelize } = require("../../models");
+const { sequelize, SXT05, SBF01A } = require("../../models");
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
-		CIN_REF: Joi.number().required(),
-		TGL: Joi.string().optional().allow(null),
-		WKT: Joi.string().optional().allow("", null),
-		KET: Joi.string().optional().allow(null),
-		USER_INPUT: Joi.string().optional().allow("", null),
-		PROSES: Joi.boolean().optional().allow(null),
+		LAT_: Joi.number().required(),
+		LONG_: Joi.number().required(),
+		COURSE: Joi.number().required(),
+		SPEED: Joi.number().required(),
+		TGL: Joi.string().required(),
+		SIGNAL: Joi.number().allow(null).required(),
+		BATTERY: Joi.number().required(),
+		KET: Joi.string().required().allow(null, ""),
+		COY_ID: Joi.string().required().allow(null, ""),
+		VISIT_ID: Joi.string().required().allow(null, ""),
+		ALTITUDE: Joi.number().required(),
+		ACCURATE: Joi.number().required(),
+		CUST: Joi.string().required().allow(null, ""),
+		LOKASI: Joi.string().allow(null, "").required(),
 	}).options({
 		allowUnknown: false,
 	});
@@ -36,50 +44,29 @@ module.exports = async (req, res) => {
 			});
 		}
 
-		const { KET, USER_INPUT, PROSES } = req.body;
+		const attendance = await SXT05.findAll({
+			where: { IDK: req.user.IDK },
+			order: [["TGL_INPUT", "DESC"]],
+			raw: true,
+		});
 
-		req.body.TGL = new Date(req.body.TGL);
-		const TGL = req.body.TGL instanceof Date && !isNaN(req.body.TGL);
-		if (!TGL) {
-			req.body.TGL = new Date();
+		if (attendance.length < 0) {
+			return res.status(409).send({
+				code: 409,
+				message: "Attendance not found",
+			});
 		}
+		req.body.IDK = req.user.IDK;
+		req.body.ID1_REF = attendance[0].ID1;
 
-		req.body.WKT = new Date(req.body.WKT);
-		const WKT = req.body.WKT instanceof Date && !isNaN(req.body.WKT);
-		if (!WKT) {
-			req.body.WKT = new Date();
-		}
-
-		const ABF27B_data = {
-			KET,
-			USER_INPUT,
-			PROSES,
-			TGL: req.body.TGL,
-			WKT: req.body.WKT,
-			IDK: user.IDK,
-			JABSEN: "Out",
-			USERID: user.ID1,
-			TGL_INPUT: new Date(),
-		};
-		await ABF27B.create(ABF27B_data, { transaction: t });
-
-		const ABF27C_data = {
-			COUT: req.body.TGL,
-			TGL_UPDATE: new Date(),
-		};
-		await ABF27C.update(
-			ABF27C_data,
-			{
-				where: { ID_REF: req.body.CIN_REF },
-			},
-			{ transaction: t },
-		);
+		await SXT05.create(req.body);
 		await t.commit();
 		res.send({
 			code: 0,
 			message: "Success",
 		});
 	} catch (err) {
+		console.log(err);
 		await t.rollback();
 		res.status(400).send({
 			code: 400,

@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { SXT01A } = require("../../models");
+const { SXT05, SBF01A } = require("../../models");
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
 		COURSE: Joi.number().required(),
 		SPEED: Joi.number().required(),
 		TGL: Joi.string().required(),
-		SIGNAL: Joi.number().required(),
+		SIGNAL: Joi.number().allow(null).required(),
 		BATTERY: Joi.number().required(),
 		KET: Joi.string().required().allow(null, ""),
 		COY_ID: Joi.string().required().allow(null, ""),
@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
 		ALTITUDE: Joi.number().required(),
 		ACCURATE: Joi.number().required(),
 		CUST: Joi.string().required().allow(null, ""),
-		LOKASI: Joi.string().required(),
+		LOKASI: Joi.string().allow(null, "").required(),
 	}).options({
 		allowUnknown: false,
 	});
@@ -43,13 +43,9 @@ module.exports = async (req, res) => {
 			});
 		}
 
-		req.body.TGL = new Date(req.body.TGL);
-		const TGL = new Date(req.body.TGL) instanceof Date && !isNaN(req.body.TGL);
-		if (!TGL) {
-			req.body.TGL = new Date();
-		}
+		req.body.IDK = req.user.IDK;
 
-		await SXT01A.create(req.body);
+		await SXT05.create(req.body);
 
 		res.send({
 			code: 0,
