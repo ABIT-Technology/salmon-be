@@ -93,7 +93,7 @@ module.exports = (sequelize, DataTypes) => {
 			modelName: "LOGINSALMON2",
 			timestamps: false,
 			freezeTableName: true,
-			tableName: "LOGIN_SALMON2",
+			tableName: "LOGINSALMON2",
 		},
 	);
 	return LOGINSALMON2;

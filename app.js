@@ -22,3 +22,4 @@ const router = require("./routes");
 app.use("/api", router);
 
 module.exports = app;
+console.log(new Date("2022-09-01T17:14:19.587Z"));

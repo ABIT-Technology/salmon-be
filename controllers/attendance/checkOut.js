@@ -44,20 +44,21 @@ module.exports = async (req, res) => {
 			});
 		}
 
-		const attendance = await SXT05.findAll({
-			where: { IDK: req.user.IDK },
-			order: [["TGL_INPUT", "DESC"]],
-			raw: true,
-		});
+		// const attendance = await SXT05.findAll({
+		// 	where: { IDK: req.user.IDK },
+		// 	order: [["TGL_INPUT", "DESC"]],
+		// 	raw: true,
+		// });
 
-		if (attendance.length < 0) {
-			return res.status(409).send({
-				code: 409,
-				message: "Attendance not found",
-			});
-		}
+		// if (attendance.length < 0) {
+		// 	return res.status(409).send({
+		// 		code: 409,
+		// 		message: "Attendance not found",
+		// 	});
+		// }
+		// req.body.ID1_REF = attendance[0].ID1;
+		req.body.TYPE = 2;
 		req.body.IDK = req.user.IDK;
-		req.body.ID1_REF = attendance[0].ID1;
 
 		await SXT05.create(req.body);
 		await t.commit();
