@@ -44,6 +44,7 @@ module.exports = async (req, res) => {
 		}
 
 		req.body.IDK = req.user.IDK;
+		req.body.TYPE = 1;
 
 		await SXT05.create(req.body);
 

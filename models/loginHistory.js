@@ -61,7 +61,7 @@ module.exports = (sequelize, DataTypes) => {
 			modelName: "LOGINHISTORY",
 			timestamps: false,
 			freezeTableName: true,
-			tableName: "LOGIN_HISTORY",
+			tableName: "LOGINHISTORY",
 		},
 	);
 	return LOGINHISTORY;

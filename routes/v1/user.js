@@ -6,6 +6,7 @@ const logger = require("../../middlewares/logger");
 
 router.get("/", userController.getAll);
 router.get("/getProfile", authJwt, userController.getProfile);
+router.get("/getOtherProfile", authJwt, userController.getOtherProfile);
 router.get("/details", authJwt, userController.details);
 router.post("/check-active-status", authJwt, userController.checkActiveStatus);
 router.post("/login", logger.login, userController.login);

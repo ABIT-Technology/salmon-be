@@ -4,8 +4,6 @@ const getCrops = require("./getCrops");
 const getMedia = require("./getMedia");
 const getCustomer = require("./getCustomer");
 const PostKegiatan = require("./PostKegiatan");
-// const { authJwt } = require("../../middlewares/jwt");
-
 
 module.exports = {
 	getKegiatan,
