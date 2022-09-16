@@ -312,17 +312,17 @@ module.exports = {
             res.status(500).json(global.getStandardResponse(500, "API error : " + err.message, null));
         }
     },
-    // FinishProyek: async (req, res) => {
-    //     try {
-    //         const sql = "UPDATE SXT02C SET STATUS = 1 WHERE ID1 = '" + req.body.ID1 + "'";
-    //         sequelize.query(sql, {
-    //             type: sequelize.QueryTypes.UPDATE,
-    //         }).then(function () {
-    //                 res.json(global.getStandardResponse(0, "success : update status kegiatan", null));
-    //         });
-    //     }
-    //     catch (err) {
-    //         res.status(500).json(global.getStandardResponse(500, "API error : " + err.message, null));
-    //     }
-    // }
+    FinishProyek: async (req, res) => {
+        try {
+            const sql = "UPDATE SXT02C SET STATUS = 1 WHERE ID1 = '" + req.body.ID1 + "'";
+            sequelize.query(sql, {
+                type: sequelize.QueryTypes.UPDATE,
+            }).then(function () {
+                    res.json(global.getStandardResponse(0, "success : update status kegiatan", null));
+            });
+        }
+        catch (err) {
+            res.status(500).json(global.getStandardResponse(500, "API error : " + err.message, null));
+        }
+    }
 }

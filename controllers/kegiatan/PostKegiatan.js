@@ -381,19 +381,19 @@ module.exports = {
 				);
 		}
 	},
-	// FinishKegiatan: async (req, res) => {
-	//     try {
-	//         const sql = "UPDATE SXT01A SET STATUS = 1 WHERE ID1 = '" + req.body.ID1 + "'";
-	//         sequelize.query(sql, {
-	//             type: sequelize.QueryTypes.UPDATE,
-	//         }).then(function () {
-	//                 res.json(global.getStandardResponse(0, "success : finish status kegiatan", null));
-	//         });
-	//     }
-	//     catch (err) {
-	//         res.status(500).json(global.getStandardResponse(500, "API error : " + err.message, null));
-	//     }
-	// }
+	FinishKegiatan: async (req, res) => {
+	    try {
+	        const sql = "UPDATE SXT01A SET STATUS = 1 WHERE ID1 = '" + req.body.ID1 + "'";
+	        sequelize.query(sql, {
+	            type: sequelize.QueryTypes.UPDATE,
+	        }).then(function () {
+	                res.json(global.getStandardResponse(0, "success : finish status kegiatan", null));
+	        });
+	    }
+	    catch (err) {
+	        res.status(500).json(global.getStandardResponse(500, "API error : " + err.message, null));
+	    }
+	},
 	ViewDetailtKegiatanByVisitId: async (req, res) => {
 		try {
 			const user = await SBF01A.findOne({

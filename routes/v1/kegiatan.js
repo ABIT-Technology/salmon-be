@@ -33,5 +33,10 @@ router.get(
 	authJwt,
 	kegiatanController.PostKegiatan.ViewUnfinishedKegiatan,
 );
+router.get(
+	"/FinishKegiatan",
+	authJwt,
+	kegiatanController.PostKegiatan.FinishKegiatan,
+);
 
 module.exports = router;

@@ -10,5 +10,6 @@ router.get("/getMasterProyek",authJwt,proyekController.getProyek.getMasterProyek
 router.post("/SubmitProyek",authJwt,proyekController.PostProyek.SubmitProyek)
 router.post("/ViewDetailProyek",authJwt,proyekController.PostProyek.ViewDetailProyek)
 router.get("/ViewUnfinishedProyek",authJwt,proyekController.PostProyek.ViewUnfinishedProyek)
+router.get("/FinishProyek",authJwt,proyekController.PostProyek.FinishProyek)
 
 module.exports = router;
