@@ -314,7 +314,7 @@ module.exports = {
     },
     FinishProyek: async (req, res) => {
         try {
-            const sql = "UPDATE SXT02C SET STATUS = 1 WHERE ID1 = '" + req.body.ID1 + "'";
+            const sql = "UPDATE SXT02C SET STATUS = 1 WHERE ID3 = '" + req.body.ID3 + "'";
             sequelize.query(sql, {
                 type: sequelize.QueryTypes.UPDATE,
             }).then(function () {
