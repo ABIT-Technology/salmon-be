@@ -1,11 +1,12 @@
 const Joi = require("joi");
 const { LOGINHISTORY } = require("../models");
+const sequelize = require("../config/configdb");
 
 module.exports = {
 	login: async (req, res, next) => {
 		try {
 			const schema = Joi.object({
-				DEVICE_ID: Joi.string().required(),
+				SALMON2_ID: Joi.string().required(),
 				ACC_NO: Joi.string().required(),
 				TGL: Joi.string().required(),
 			}).options({
@@ -20,15 +21,18 @@ module.exports = {
 					message: validate.error.message,
 				});
 			}
-			const { DEVICE_ID, ACC_NO, TGL } = req.body;
-			const logger = await LOGINHISTORY.create({
-				DEVICE_ID,
-				ACC_NO,
-				TGL: new Date(TGL),
-				KET: "pending",
-				TYPE: "login",
+			const { SALMON2_ID, ACC_NO, TGL } = req.body;
+			const sql = `INSERT INTP SBF01X(TGL,SALMON2_ID,ACC_NO,VALID) VALUES(${TGL},${SALMON2_ID},${ACC_NO},${false});`;
+			const logger = await sequelize.query(sql, {
+				type: sequelize.QueryTypes.INSERT,
 			});
-			console.log(logger);
+			// const logger = await LOGINHISTORY.create({
+			// 	SALMON2_ID,
+			// 	ACC_NO,
+			// 	TGL: new Date(TGL),
+			// 	KET: "pending",
+			// 	TYPE: "login",
+			// });
 			req.logger = logger;
 			return next();
 		} catch (err) {

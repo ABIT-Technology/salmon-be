@@ -4,7 +4,12 @@ const { createJWTToken } = require("../../middlewares/jwt");
 module.exports = async (req, res) => {
 	try {
 		const user = await SBF01A.findOne({
-			where: { IDK: req.user.IDK, AKTIF: 1, ACC_NO: req.body.ACC_NO },
+			where: {
+				IDK: req.user.IDK,
+				AKTIF: 1,
+				ACC_NO: req.body.ACC_NO,
+				SALMON2_ID: req.body.SALMON2_ID,
+			},
 		});
 
 		if (!user) {
