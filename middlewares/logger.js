@@ -1,6 +1,6 @@
 const Joi = require("joi");
 const { LOGINHISTORY } = require("../models");
-const sequelize = require("../config/configdb");
+const sequelize = require("../config/configdb2");
 
 module.exports = {
 	login: async (req, res, next) => {
