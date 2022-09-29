@@ -1,11 +1,12 @@
 const Joi = require("joi");
 const { SBF01A, LOGINSALMON2, LOGINHISTORY } = require("../../models");
 const { createJWTToken } = require("../../middlewares/jwt");
+const sequelize = require("../../config/configdb");
 const { JWT_ACCESS_TOKEN_SECRET } = process.env;
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
-		DEVICE_ID: Joi.string().required(),
+		SALMON2_ID: Joi.string().required(),
 		ACC_NO: Joi.string().required(),
 		LAT_: Joi.number().required(),
 		LONG_: Joi.number().required(),
@@ -31,7 +32,7 @@ module.exports = async (req, res) => {
 	}
 
 	const {
-		DEVICE_ID,
+		SALMON2_ID,
 		ACC_NO,
 		LAT_,
 		LONG_,
@@ -49,7 +50,7 @@ module.exports = async (req, res) => {
 		const user = await SBF01A.findOne({
 			where: {
 				ACC_NO,
-				DEVICE_ID,
+				SALMON2_ID,
 				AKTIF: 1,
 			},
 			raw: true,
@@ -62,31 +63,35 @@ module.exports = async (req, res) => {
 			});
 		}
 
-		await LOGINSALMON2.create({
-			DEVICE_ID,
-			ACC_NO,
-			LAT_,
-			LONG_,
-			COURSE,
-			SPEED,
-			TGL,
-			SIGNAL,
-			BATTERY,
-			ALTITUDE,
-			ACCURATE,
-			LOKASI,
-			IDK: user.IDK,
-		});
+		// await LOGINSALMON2.create({
+		// 	DEVICE_ID,
+		// 	ACC_NO,
+		// 	LAT_,
+		// 	LONG_,
+		// 	COURSE,
+		// 	SPEED,
+		// 	TGL,
+		// 	SIGNAL,
+		// 	BATTERY,
+		// 	ALTITUDE,
+		// 	ACCURATE,
+		// 	LOKASI,
+		// 	IDK: user.IDK,
+		// });
 
-		await LOGINHISTORY.update(
-			{
-				TGL_UPDATE: new Date(),
-				KET: "success",
-			},
-			{
-				where: { ID1: req.logger.ID1 },
-			},
-		);
+		const sql = `UPDATE SBF01X SET ACC_NO = ${ACC_NO}, SALMON2_ID = ${SALMON2_ID}, VALID = ${true} WHERE ID1 = ${
+			req.logger.ID1
+		};`;
+		await sequelize.query(sql, { type: sequelize.QueryTypes.UPDATE });
+		// await LOGINHISTORY.update(
+		// 	{
+		// 		TGL_UPDATE: new Date(),
+		// 		KET: "success",
+		// 	},
+		// 	{
+		// 		where: { ID1: req.logger.ID1 },
+		// 	},
+		// );
 
 		const accessToken = createJWTToken(
 			{ IDK: user.IDK },
