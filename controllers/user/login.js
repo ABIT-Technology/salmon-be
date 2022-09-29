@@ -1,7 +1,7 @@
 const Joi = require("joi");
 const { SBF01A, LOGINSALMON2, LOGINHISTORY } = require("../../models");
 const { createJWTToken } = require("../../middlewares/jwt");
-const sequelize = require("../../config/configdb");
+const sequelize = require("../../config/configdb2");
 const { JWT_ACCESS_TOKEN_SECRET } = process.env;
 
 module.exports = async (req, res) => {
