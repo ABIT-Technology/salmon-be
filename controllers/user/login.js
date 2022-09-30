@@ -73,10 +73,8 @@ module.exports = async (req, res) => {
 		// 	LOKASI,
 		// 	IDK: user.IDK,
 		// });
-
-		const sql = `UPDATE SBF01X SET ACC_NO = '${ACC_NO}', SALMON2_ID = '${SALMON2_ID}', VALID='${true}' WHERE ID1 = ${
-			req.logger.ID1
-		};`;
+		console.log(req.logger);
+		const sql = `UPDATE SBF01X SET ACC_NO = '${ACC_NO}', SALMON2_ID = '${SALMON2_ID}', VALID=1 WHERE ID1 = ${req.logger.ID1};`;
 		await sequelize.query(sql, { type: sequelize.QueryTypes.UPDATE });
 		// await SBF01X.update(
 		// 	{
