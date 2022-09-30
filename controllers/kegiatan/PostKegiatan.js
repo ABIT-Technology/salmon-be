@@ -1,7 +1,7 @@
 const Joi = require("joi");
 const sequelize = require("../../config/configdb");
 const global = require("../../config/global");
-const { SBF01A } = require("../../models");
+const sequelizeSBOX = require("../../config/configdb2");
 
 module.exports = {
 	SubmitKegiatan: async (req, res) => {
@@ -40,15 +40,14 @@ module.exports = {
 			});
 		}
 
-		const user = await SBF01A.findOne({
-			where: { IDK: req.user.IDK },
-			raw: true,
-		});
+		const [results1, metadata1] = await sequelizeSBOX.query(
+			`SELECT * FROM SBF01A WHERE IDK = ${req.user.IDK};`,
+		);
 
-		if (!user) {
-			return res.status(409).send({
-				code: 409,
-				message: "User not authorized",
+		if (results1.length <= 0) {
+			return res.status(404).send({
+				code: 404,
+				message: "User not found",
 			});
 		}
 
@@ -81,17 +80,55 @@ module.exports = {
 			let COY_ID = 0;
 
 			const [results, metadata] = await sequelize.query(
-				"SELECT TOP 1 * FROM ABF02A WHERE AKTIF = 1 AND IDK='" +
+				"SELECT TOP 1 * FROM vwABF02A WHERE AKTIF = 1 AND IDK='" +
 					req.user.IDK +
 					"'",
 			);
+			console.log(results);
 			if (results != null) {
 				COY_ID = results[0]["COY_ID"];
 			}
 
 			// save table header transaksi kegiatan
+			// const sql =
+			// 	"INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,COY_ID,VISIT_ID,TYPE,ALTITUDE" +
+			// 	",ACCURATE,CUST,LOKASI,ID1_REF,STATUS) values('" +
+			// 	req.user.IDK +
+			// 	"','" +
+			// 	req.body.LAT_ +
+			// 	"','" +
+			// 	req.body.LONG_ +
+			// 	"','" +
+			// 	req.body.COURSE +
+			// 	"','" +
+			// 	req.body.SPEED +
+			// 	"','" +
+			// 	req.body.TGL +
+			// 	"',GETDATE(),'" +
+			// 	req.body.SIGNAL +
+			// 	"','" +
+			// 	req.body.BATTERY +
+			// 	"'," +
+			// 	(req.body.KET == null ? "NULL" : "'" + req.body.KET + "'") +
+			// 	",'" +
+			// 	COY_ID +
+			// 	"','" +
+			// 	(VISIT_ID == 0 ? req.body.VISIT_ID : VISIT_ID) +
+			// 	"',0,'" +
+			// 	req.body.ALTITUDE +
+			// 	"','" +
+			// 	req.body.ACCURATE +
+			// 	"'," +
+			// 	(req.body.CUST == null ? "NULL" : "'" + req.body.CUST + "'") +
+			// 	",'" +
+			// 	req.body.LOKASI +
+			// 	"'," +
+			// 	(ID1_REF == null || ID1_REF == "" ? "NULL" : ID1_REF) +
+			// 	"," +
+			// 	status +
+			// 	")";
 			const sql =
-				"INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,COY_ID,VISIT_ID,TYPE,ALTITUDE" +
+				"INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,ID_,VISIT_ID,TYPE,ALTITUDE" +
 				",ACCURATE,CUST,LOKASI,ID1_REF,STATUS) values('" +
 				req.user.IDK +
 				"','" +
@@ -265,15 +302,14 @@ module.exports = {
 
 	ViewDetailtKegiatan: async (req, res) => {
 		try {
-			const user = await SBF01A.findOne({
-				where: { IDK: req.user.IDK },
-				raw: true,
-			});
+			const [results1, metadata1] = await sequelizeSBOX.query(
+				`SELECT * FROM SBF01A WHERE IDK = ${req.user.IDK};`,
+			);
 
-			if (!user) {
-				return res.status(409).send({
-					code: 409,
-					message: "User not authorized",
+			if (results1.length <= 0) {
+				return res.status(404).send({
+					code: 404,
+					message: "User not found",
 				});
 			}
 
@@ -322,17 +358,17 @@ module.exports = {
 
 	ViewUnfinishedKegiatan: async (req, res) => {
 		try {
-			const user = await SBF01A.findOne({
-				where: { IDK: req.user.IDK },
-				raw: true,
-			});
+			const [results1, metadata1] = await sequelizeSBOX.query(
+				`SELECT * FROM SBF01A WHERE IDK = ${req.user.IDK};`,
+			);
 
-			if (!user) {
-				return res.status(409).send({
-					code: 409,
-					message: "User not authorized",
+			if (results1.length <= 0) {
+				return res.status(404).send({
+					code: 404,
+					message: "User not found",
 				});
 			}
+
 			let json = [];
 			// const results = await sequelize.query("select TOP 1 * from SXT01A where IDK = " + req.user.IDK + " and ID1_REF NOT IN(" +
 			//     " select distinct ID1_REF" +
@@ -382,29 +418,40 @@ module.exports = {
 		}
 	},
 	FinishKegiatan: async (req, res) => {
-	    try {
-	        const sql = "UPDATE SXT01A SET STATUS = 1 WHERE ID1 = '" + req.body.ID1 + "'";
-	        sequelize.query(sql, {
-	            type: sequelize.QueryTypes.UPDATE,
-	        }).then(function () {
-	                res.json(global.getStandardResponse(0, "success : finish status kegiatan", null));
-	        });
-	    }
-	    catch (err) {
-	        res.status(500).json(global.getStandardResponse(500, "API error : " + err.message, null));
-	    }
+		try {
+			const sql =
+				"UPDATE SXT01A SET STATUS = 1 WHERE ID1 = '" + req.body.ID1 + "'";
+			sequelize
+				.query(sql, {
+					type: sequelize.QueryTypes.UPDATE,
+				})
+				.then(function () {
+					res.json(
+						global.getStandardResponse(
+							0,
+							"success : finish status kegiatan",
+							null,
+						),
+					);
+				});
+		} catch (err) {
+			res
+				.status(500)
+				.json(
+					global.getStandardResponse(500, "API error : " + err.message, null),
+				);
+		}
 	},
 	ViewDetailtKegiatanByVisitId: async (req, res) => {
 		try {
-			const user = await SBF01A.findOne({
-				where: { IDK: req.user.IDK },
-				raw: true,
-			});
+			const [results1, metadata1] = await sequelizeSBOX.query(
+				`SELECT * FROM SBF01A WHERE IDK = ${req.user.IDK};`,
+			);
 
-			if (!user) {
-				return res.status(409).send({
-					code: 409,
-					message: "User not authorized",
+			if (results1.length <= 0) {
+				return res.status(404).send({
+					code: 404,
+					message: "User not found",
 				});
 			}
 

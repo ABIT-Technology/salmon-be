@@ -1,5 +1,6 @@
 const Joi = require("joi");
-const { SXT05, SBF01A } = require("../../models");
+const { SXT05 } = require("../../models");
+const sequelize = require("../../config/configdb2");
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
@@ -31,14 +32,13 @@ module.exports = async (req, res) => {
 	}
 
 	try {
-		const user = await SBF01A.findOne({
-			where: { IDK: req.user.IDK },
-			raw: true,
-		});
+		const [results, metadata] = await sequelize.query(
+			`SELECT * FROM SBF01A WHERE AKTIF = ${1} AND IDK = '${req.user.IDK}';`,
+		);
 
-		if (!user) {
-			return res.status(409).send({
-				code: 409,
+		if (results.length <= 0) {
+			return res.status(404).send({
+				code: 404,
 				message: "User not found",
 			});
 		}

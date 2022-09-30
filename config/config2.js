@@ -11,6 +11,13 @@ module.exports = {
 		host: DB_HOSTNAME2,
 		port: parseInt(DB_PORT2),
 		dialect: "mssql",
+		dialectOptions: {
+			// Observe the need for this nested `options` field for MSSQL
+			options: {
+				encrypt: false,
+				enableArithAbort: false,
+			},
+		},
 	},
 	test: {
 		username: DB_USERNAME2,
@@ -19,6 +26,13 @@ module.exports = {
 		host: DB_HOSTNAME2,
 		port: parseInt(DB_PORT2),
 		dialect: "mssql",
+		dialectOptions: {
+			// Observe the need for this nested `options` field for MSSQL
+			options: {
+				encrypt: false,
+				enableArithAbort: false,
+			},
+		},
 	},
 	production: {
 		username: DB_USERNAME2,
@@ -27,5 +41,12 @@ module.exports = {
 		host: DB_HOSTNAME2,
 		port: parseInt(DB_PORT2),
 		dialect: "mssql",
+		dialectOptions: {
+			// Observe the need for this nested `options` field for MSSQL
+			options: {
+				encrypt: false,
+				enableArithAbort: false,
+			},
+		},
 	},
 };

@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { SBF01A, LOGINSALMON2, LOGINHISTORY } = require("../../models");
+const { SBF01A, SBF01X } = require("../../models");
 const { createJWTToken } = require("../../middlewares/jwt");
 const sequelize = require("../../config/configdb2");
 const { JWT_ACCESS_TOKEN_SECRET } = process.env;
@@ -47,16 +47,11 @@ module.exports = async (req, res) => {
 	} = req.body;
 
 	try {
-		const user = await SBF01A.findOne({
-			where: {
-				ACC_NO,
-				SALMON2_ID,
-				AKTIF: 1,
-			},
-			raw: true,
-		});
+		const [results, metadata] = await sequelize.query(
+			`SELECT * FROM SBF01A WHERE AKTIF = ${1} AND ACC_NO = '${ACC_NO}' AND SALMON2_ID = '${SALMON2_ID}';`,
+		);
 
-		if (!user) {
+		if (results.length <= 0) {
 			return res.status(404).send({
 				code: 404,
 				message: "User not found",
@@ -79,14 +74,13 @@ module.exports = async (req, res) => {
 		// 	IDK: user.IDK,
 		// });
 
-		const sql = `UPDATE SBF01X SET ACC_NO = ${ACC_NO}, SALMON2_ID = ${SALMON2_ID}, VALID = ${true} WHERE ID1 = ${
+		const sql = `UPDATE SBF01X SET ACC_NO = '${ACC_NO}', SALMON2_ID = '${SALMON2_ID}', VALID='${true}' WHERE ID1 = ${
 			req.logger.ID1
 		};`;
 		await sequelize.query(sql, { type: sequelize.QueryTypes.UPDATE });
-		// await LOGINHISTORY.update(
+		// await SBF01X.update(
 		// 	{
-		// 		TGL_UPDATE: new Date(),
-		// 		KET: "success",
+		// 		VALID: true,
 		// 	},
 		// 	{
 		// 		where: { ID1: req.logger.ID1 },
@@ -94,7 +88,7 @@ module.exports = async (req, res) => {
 		// );
 
 		const accessToken = createJWTToken(
-			{ IDK: user.IDK },
+			{ IDK: results[0].IDK },
 			JWT_ACCESS_TOKEN_SECRET,
 		);
 
@@ -102,7 +96,7 @@ module.exports = async (req, res) => {
 			code: 0,
 			message: "Success",
 			data: {
-				ACC_NO: user.ACC_NO,
+				ACC_NO: results[0].ACC_NO,
 				accessToken,
 			},
 		});
