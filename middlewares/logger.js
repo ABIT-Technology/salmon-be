@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { LOGINHISTORY } = require("../models");
+const { SBF01X } = require("../models");
 const sequelize = require("../config/configdb2");
 
 module.exports = {
@@ -21,18 +21,19 @@ module.exports = {
 					message: validate.error.message,
 				});
 			}
-			const { SALMON2_ID, ACC_NO, TGL } = req.body;
-			const sql = `INSERT INTP SBF01X(TGL,SALMON2_ID,ACC_NO,VALID) VALUES(${TGL},${SALMON2_ID},${ACC_NO},${false});`;
-			const logger = await sequelize.query(sql, {
+			const { SALMON2_ID, ACC_NO } = req.body;
+			const sql = `INSERT INTO SBF01X(SALMON2_ID,ACC_NO) VALUES('${SALMON2_ID}','${ACC_NO}');`;
+			let logger = await sequelize.query(sql, {
 				type: sequelize.QueryTypes.INSERT,
 			});
-			// const logger = await LOGINHISTORY.create({
+			console.log("logger", logger);
+			// const logger = await SBF01X.create({
 			// 	SALMON2_ID,
 			// 	ACC_NO,
 			// 	TGL: new Date(TGL),
-			// 	KET: "pending",
-			// 	TYPE: "login",
+			// 	VALID: false,
 			// });
+			logger = { ID1: logger[1] };
 			req.logger = logger;
 			return next();
 		} catch (err) {

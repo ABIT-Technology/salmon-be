@@ -10,7 +10,7 @@ require("sequelize").DATE.prototype._stringify = function _stringify(
 	return date.format("YYYY-MM-DD HH:mm:ss.SSS");
 };
 module.exports = (sequelize, DataTypes) => {
-	class LOGINHISTORY extends Model {
+	class SBF01X extends Model {
 		/**
 		 * Helper method for defining associations.
 		 * This method is not a part of Sequelize lifecycle.
@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
 			// define association here
 		}
 	}
-	LOGINHISTORY.init(
+	SBF01X.init(
 		{
 			ID1: {
 				allowNull: false,
@@ -28,41 +28,45 @@ module.exports = (sequelize, DataTypes) => {
 				primaryKey: true,
 				type: DataTypes.INTEGER,
 			},
-			ACC_NO: {
-				type: DataTypes.STRING,
-				defaultValue: "",
-			},
-			DEVICE_ID: {
-				type: DataTypes.STRING,
-				defaultValue: "",
-			},
-			TYPE: {
-				type: DataTypes.TEXT,
-				defaultValue: "",
-			},
 			TGL: {
 				type: DataTypes.DATE,
 			},
-			TGL_INPUT: {
-				type: DataTypes.DATE,
-				defaultValue: new Date(),
+			SALMON2_ID: {
+				type: DataTypes.STRING,
 			},
-			TGL_UPDATE: {
-				type: DataTypes.DATE,
-				defaultValue: new Date(),
+			ACC_NO: {
+				type: DataTypes.STRING,
 			},
-			KET: {
-				type: DataTypes.TEXT,
-				defaultValue: "",
+			VALID: {
+				type: DataTypes.BOOLEAN,
+				defaultValue: false,
+			},
+			APP: {
+				type: DataTypes.BOOLEAN,
+			},
+			APP_BY: {
+				type: DataTypes.STRING,
+			},
+			APP_TGL: {
+				type: DataTypes.DATE,
+			},
+			REJECT: {
+				type: DataTypes.BOOLEAN,
+			},
+			REJECT_BY: {
+				type: DataTypes.STRING,
+			},
+			REJECT_TGL: {
+				type: DataTypes.DATE,
 			},
 		},
 		{
 			sequelize,
-			modelName: "LOGINHISTORY",
+			modelName: "SBF01X",
 			timestamps: false,
 			freezeTableName: true,
-			tableName: "LOGINHISTORY",
+			tableName: "SBF01X",
 		},
 	);
-	return LOGINHISTORY;
+	return SBF01X;
 };

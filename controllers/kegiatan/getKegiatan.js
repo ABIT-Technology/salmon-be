@@ -1,25 +1,24 @@
 const sequelize = require("../../config/configdb");
+const sequelizeSBOX = require("../../config/configdb2");
 const global = require("../../config/global");
-const { SBF01A } = require("../../models");
 
 module.exports = async (req, res) => {
 	try {
-		const user = await SBF01A.findOne({
-			where: { IDK: req.user.IDK },
-			raw: true,
-		});
+		const [results1, metadata1] = await sequelizeSBOX.query(
+			`SELECT * FROM SBF01A WHERE IDK = ${req.user.IDK};`,
+		);
 
-		if (!user) {
-			return res.status(409).send({
-				code: 409,
-				message: "User not authorized",
+		if (results1.length <= 0) {
+			return res.status(404).send({
+				code: 404,
+				message: "User not found",
 			});
 		}
 		// GET COY_ID from current login user
 		let COY_ID = "0";
 
 		const results2 = await sequelize.query(
-			"SELECT TOP 1 * FROM ABF02A WHERE AKTIF = 1 AND IDK='" +
+			"SELECT TOP 1 * FROM vwABF02A WHERE AKTIF = 1 AND IDK='" +
 				req.user.IDK +
 				"'",
 		);
@@ -28,7 +27,7 @@ module.exports = async (req, res) => {
 		}
 
 		const [results, metadata] = await sequelize.query(
-			"SELECT * FROM SXF03 WHERE AKTIF = 1 AND KEGIATAN = 1 AND COY_ID = '" +
+			"SELECT * FROM SXF03 WHERE ISNULL(KEGIATAN,0) = 1 AND ISNULL(AKTIF,0) = 1 AND COY_ID = '" +
 				COY_ID +
 				"'",
 		);

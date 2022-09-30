@@ -1,21 +1,19 @@
-const { SBF01A } = require("../../models");
-const { createJWTToken } = require("../../middlewares/jwt");
+const sequelize = require("../../config/configdb2");
 
 module.exports = async (req, res) => {
 	try {
-		const user = await SBF01A.findOne({
-			where: {
-				IDK: req.user.IDK,
-				AKTIF: 1,
-				ACC_NO: req.body.ACC_NO,
-				SALMON2_ID: req.body.SALMON2_ID,
-			},
-		});
+		const [results, metadata] = await sequelize.query(
+			`SELECT * FROM SBF01A WHERE AKTIF = ${1} AND ACC_NO = '${
+				req.body.ACC_NO
+			}' AND SALMON2_ID = '${req.body.SALMON2_ID}' AND IDK = '${
+				req.user.IDK
+			}';`,
+		);
 
-		if (!user) {
+		if (results.length <= 0) {
 			return res.status(404).send({
 				code: 404,
-				message: "User not active",
+				message: "User not found",
 			});
 		}
 
