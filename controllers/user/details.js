@@ -1,10 +1,10 @@
-const { SBF01A } = require("../../models");
-const sequelize = require("../../config/configdb2");
+const sequelizeSBOX = require("../../config/configdb2");
 
 module.exports = async (req, res) => {
 	try {
-		const [results, metadata] = await sequelize.query(
-			`SELECT * FROM SBF01A WHERE AKTIF = ${1} AND IDK = '${req.user.IDK}';`,
+		const [results, metadata] = await sequelizeSBOX.query(
+			`SELECT a.*, b.NAMA, b.NABAGIAN FROM SBF01A a JOIN salmon2.dbo.vwABF02A b ON
+			a.IDK = b.IDK WHERE a.AKTIF = ${1} AND a.IDK = '${req.user.IDK}';`,
 		);
 
 		if (results.length <= 0) {

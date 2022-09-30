@@ -1,32 +1,28 @@
 const sequelize = require("../../config/configdb");
 const global = require("../../config/global");
-const { SBF01A } = require("../../models");
+const sequelizeSBOX = require("../../config/configdb2");
 
 module.exports = async (req, res) => {
 	try {
-		const user = await SBF01A.findOne({
-			where: { IDK: req.query.IDK },
-			raw: true,
-		});
+		const [results1, metadata1] = await sequelizeSBOX.query(
+			`SELECT * FROM SBF01A WHERE IDK = ${req.user.IDK};`,
+		);
 
-		if (!user) {
-			return res.status(409).send({
-				code: 409,
-				message: "User not authorized",
+		if (results1.length <= 0) {
+			return res.status(404).send({
+				code: 404,
+				message: "User not found",
 			});
 		}
 
 		const [results, metadata] = await sequelize.query(
-			`SELECT TOP 1 a.ID1, a.IDK, a.NIK, a.BAGIAN, c.NAWIL 
-			FROM ABF02A a
-			JOIN SBF01D b
-			ON a.IDK = b.IDK
-			JOIN VWABF10B c
-			ON b.WIL = c.WIL
-			WHERE a.AKTIF = 1 AND a.IDK = ${req.query.IDK};`,
+			`SELECT TOP 1 * 
+			FROM vwABF02A
+			WHERE AKTIF = 1 AND IDK = ${req.user.IDK};`,
 		);
-		res.json(global.getStandardResponse(0, "success", results));
+		res.json(global.getStandardResponse(0, "success", results[0]));
 	} catch (err) {
+		console.log(err);
 		res.status(500).json(global.getStandardResponse(500, "API error", null));
 	}
 };

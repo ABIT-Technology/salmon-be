@@ -22,18 +22,17 @@ module.exports = {
 				});
 			}
 			const { SALMON2_ID, ACC_NO } = req.body;
-			const sql = `INSERT INTO SBF01X(SALMON2_ID,ACC_NO) VALUES('${SALMON2_ID}','${ACC_NO}');`;
+			const sql = `INSERT INTO SBF01X(SALMON2_ID,ACC_NO) OUTPUT Inserted.ID1 VALUES('${SALMON2_ID}','${ACC_NO}');`;
 			let logger = await sequelize.query(sql, {
 				type: sequelize.QueryTypes.INSERT,
 			});
-			console.log("logger", logger);
 			// const logger = await SBF01X.create({
 			// 	SALMON2_ID,
 			// 	ACC_NO,
 			// 	TGL: new Date(TGL),
 			// 	VALID: false,
 			// });
-			logger = { ID1: logger[1] };
+			logger = { ID1: logger[0][0].ID1 };
 			req.logger = logger;
 			return next();
 		} catch (err) {
