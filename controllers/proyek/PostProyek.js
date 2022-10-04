@@ -200,14 +200,16 @@ module.exports = {
 
             // save image
             let image = req.body.image;
-            for (let i = 0; i < image.length; i++) {
-                let imagefilename = global.uploadBase64Image(image[i]);
+            if (image != undefined) {
+                for (let i = 0; i < image.length; i++) {
+                    let imagefilename = global.uploadBase64Image(image[i]);
 
-                const sqlcrops = "INSERT INTO SXT02G(ID1,ID3,PHOTO,TGL_INPUT,USER_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
-                    + headerid + "','" + imagefilename + "',GETDATE(),'" + req.user.IDK + "')";
-                sequelize.query(sqlcrops, {
-                    type: sequelize.QueryTypes.INSERT
-                });
+                    const sqlcrops = "INSERT INTO SXT02G(ID1,ID3,PHOTO,TGL_INPUT,USER_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
+                        + headerid + "','" + imagefilename + "',GETDATE(),'" + req.user.IDK + "')";
+                    sequelize.query(sqlcrops, {
+                        type: sequelize.QueryTypes.INSERT
+                    });
+                }
             }
             // end of image
 
@@ -314,12 +316,159 @@ module.exports = {
     },
     FinishProyek: async (req, res) => {
         try {
-            const sql = "UPDATE SXT02C SET STATUS = 1 WHERE ID3 = '" + req.body.ID3 + "'";
+
+            const schema = Joi.object({
+                ID3: Joi.string().required(),
+                KET: Joi.string().required().allow(null, ""),
+                LOKASI: Joi.string().required().allow(null, ""),
+                product: Joi.array().allow(null, ""),
+                crops: Joi.array().allow(null, ""),
+                media: Joi.array().allow(null, ""),
+                image: Joi.array().allow(null, ""),
+            }).options({
+                allowUnknown: false,
+            });
+
+            const validate = schema.validate(req.body);
+
+            if (validate.error) {
+                return res.status(400).send({
+                    code: 400,
+                    message: validate.error.message,
+                });
+            }
+
+            const user = await SBF01A.findOne({
+                where: { IDK: req.user.IDK },
+                raw: true,
+            });
+
+            if (!user) {
+                return res.status(409).send({
+                    code: 409,
+                    message: "User not authorized",
+                });
+            }
+
+            let ID1_REF = null;
+            // if (req.body.ID1 != undefined) {
+            const reskegiatan = await sequelize.query("select * from SXT02C "
+                + " where ID3 = " + req.body.ID3);
+            if (reskegiatan != null) {
+                try {
+                    ID1_REF = reskegiatan[0][0].ID1;
+                }
+                catch {
+                    return res.status(409).send({
+                        code: 409,
+                        message: "Project not found",
+                    });
+                }
+            }
+            else {
+                return res.status(409).send({
+                    code: 409,
+                    message: "Project not found",
+                });
+            }
+            // }
+
+            const sql = "UPDATE SXT02C SET STATUS = 1, " +
+                "KET = " + (req.body.KET == null ? "NULL" : "'" + req.body.KET + "'") +
+                ", LOKASI = " + (req.body.LOKASI == null ? "NULL" : "'" + req.body.LOKASI + "'") +
+                " WHERE ID3 = '" + req.body.ID3 + "'";
             sequelize.query(sql, {
                 type: sequelize.QueryTypes.UPDATE,
             }).then(function () {
-                    res.json(global.getStandardResponse(0, "success : update status kegiatan", null));
+
+
+                // save product
+                let product = req.body.product;
+                const schemaproduct = Joi.object({
+                    BRG: Joi.string().required(),
+                    QTY: Joi.number().required(),
+                    STN: Joi.number().required(),
+                }).options({
+                    allowUnknown: false,
+                });
+                if (product != undefined) {
+                    for (let i = 0; i < product.length; i++) {
+
+                        if (schemaproduct.validate(product[i]).error) {
+                            throw new Error(schemaproduct.validate(product[i]).error);
+                        }
+                        const sqlprod = "INSERT INTO SXT02D(ID1,ID3,BRG,QTY,STN,TGL_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
+                            + req.body.ID3 + "','" + product[i]["BRG"] + "','" + product[i]["QTY"] + "','"
+                            + product[i]["STN"] + "',GETDATE())";
+                        sequelize.query(sqlprod, {
+                            type: sequelize.QueryTypes.INSERT
+                        });
+                    }
+                }
+                // end of save product
+
+                // save media promosi
+                let media = req.body.media;
+                const schemamedia = Joi.object({
+                    MEDIA: Joi.string().required(),
+                    QTY: Joi.number().required(),
+                }).options({
+                    allowUnknown: false,
+                });
+                if (media != undefined) {
+                    for (let i = 0; i < media.length; i++) {
+                        if (schemamedia.validate(media[i]).error) {
+                            throw new Error(schemamedia.validate(media[i]).error);
+                        }
+                        const sqlmedia = "INSERT INTO SXT02E(ID1,ID3,MEDIA,QTY,TGL_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
+                            + req.body.ID3 + "','" + media[i]["MEDIA"] + "','" + media[i]["QTY"] + "',GETDATE())";
+                        sequelize.query(sqlmedia, {
+                            type: sequelize.QueryTypes.INSERT
+                        });
+                        console.log(media[i]["nama"]);
+                    }
+                }
+                // end of media promosi
+
+                // save crops
+                let crops = req.body.crops;
+                const schemacrops = Joi.object({
+                    CROPS: Joi.string().required(),
+                }).options({
+                    allowUnknown: false,
+                });
+                if (crops != undefined) {
+                    for (let i = 0; i < crops.length; i++) {
+                        if (schemacrops.validate(crops[i]).error) {
+                            throw new Error(schemacrops.validate(crops[i]).error);
+                        }
+                        const sqlcrops = "INSERT INTO SXT02F(ID1,ID3,CROPS,TGL_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
+                            + req.body.ID3 + "','" + crops[i]["CROPS"] + "',GETDATE())";
+                        sequelize.query(sqlcrops, {
+                            type: sequelize.QueryTypes.INSERT
+                        });
+                    }
+                }
+                // end of save crops
+
+                // save image
+                let image = req.body.image;
+                if (image != undefined) {
+                    for (let i = 0; i < image.length; i++) {
+                        let imagefilename = global.uploadBase64Image(image[i]);
+
+                        const sqlcrops = "INSERT INTO SXT02G(ID1,ID3,PHOTO,TGL_INPUT,USER_INPUT) VALUES(" + (ID1_REF == null ? "NULL" : ID1_REF) + ",'"
+                            + req.body.ID3 + "','" + imagefilename + "',GETDATE(),'" + req.user.IDK + "')";
+                        sequelize.query(sqlcrops, {
+                            type: sequelize.QueryTypes.INSERT
+                        });
+                    }
+                }
+                // end of image
+
+                res.json(global.getStandardResponse(0, "success : update status proyek", null));
             });
+
         }
         catch (err) {
             res.status(500).json(global.getStandardResponse(500, "API error : " + err.message, null));

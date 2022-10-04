@@ -419,27 +419,158 @@ module.exports = {
 	},
 	FinishKegiatan: async (req, res) => {
 		try {
-			const sql =
-				"UPDATE SXT01A SET STATUS = 1 WHERE ID1 = '" + req.body.ID1 + "'";
-			sequelize
-				.query(sql, {
-					type: sequelize.QueryTypes.UPDATE,
-				})
-				.then(function () {
-					res.json(
-						global.getStandardResponse(
-							0,
-							"success : finish status kegiatan",
-							null,
-						),
-					);
+			const schema = Joi.object({
+				ID1: Joi.string().required(),
+				KET: Joi.string().required().allow(null, ""),
+				LOKASI: Joi.string().required().allow(null, ""),
+				product: Joi.array().allow(null, ""),
+				crops: Joi.array().allow(null, ""),
+				media: Joi.array().allow(null, ""),
+				image: Joi.array().allow(null, ""),
+			}).options({
+				allowUnknown: false,
+			});
+
+			const validate = schema.validate(req.body);
+
+			if (validate.error) {
+				return res.status(400).send({
+					code: 400,
+					message: validate.error.message,
 				});
-		} catch (err) {
-			res
-				.status(500)
-				.json(
-					global.getStandardResponse(500, "API error : " + err.message, null),
-				);
+			}
+
+			const user = await SBF01A.findOne({
+				where: { IDK: req.user.IDK },
+				raw: true,
+			});
+
+			if (!user) {
+				return res.status(409).send({
+					code: 409,
+					message: "User not authorized",
+				});
+			}
+
+			const sql = "UPDATE SXT01A SET STATUS = 1, " +
+				"KET = " + (req.body.KET == null ? "NULL" : "'" + req.body.KET + "'") +
+				", LOKASI = " + (req.body.LOKASI == null ? "NULL" : "'" + req.body.LOKASI + "'") +
+				" WHERE ID1 = '" + req.body.ID1 + "'";
+			sequelize.query(sql, {
+				type: sequelize.QueryTypes.UPDATE,
+			}).then(function () {
+
+				// save product
+				let product = req.body.product;
+				const schemaproduct = Joi.object({
+					BRG: Joi.string().required(),
+					QTY: Joi.number().required(),
+					STN: Joi.number().required(),
+				}).options({
+					allowUnknown: false,
+				});
+				if (product !== undefined) {
+					for (let i = 0; i < product.length; i++) {
+						if (schemaproduct.validate(product[i]).error) {
+							throw new Error(schemaproduct.validate(product[i]).error);
+						}
+						const sqlprod =
+							"INSERT INTO SXT01B(ID1,BRG,QTY,STN,TGL_INPUT) VALUES('" +
+							req.body.ID1 +
+							"','" +
+							product[i]["BRG"] +
+							"','" +
+							product[i]["QTY"] +
+							"','" +
+							product[i]["STN"] +
+							"',GETDATE())";
+						sequelize.query(sqlprod, {
+							type: sequelize.QueryTypes.INSERT,
+						});
+					}
+				}
+				// end of save product
+
+				// save media promosi
+				let media = req.body.media;
+				const schemamedia = Joi.object({
+					MEDIA: Joi.string().required(),
+					QTY: Joi.number().required(),
+				}).options({
+					allowUnknown: false,
+				});
+				if (media !== undefined) {
+					for (let i = 0; i < media.length; i++) {
+						if (schemamedia.validate(media[i]).error) {
+							throw new Error(schemamedia.validate(media[i]).error);
+						}
+						const sqlmedia =
+							"INSERT INTO SXT01C(ID1,MEDIA,QTY,TGL_INPUT) VALUES('" +
+							req.body.ID1 +
+							"','" +
+							media[i]["MEDIA"] +
+							"','" +
+							media[i]["QTY"] +
+							"',GETDATE())";
+						sequelize.query(sqlmedia, {
+							type: sequelize.QueryTypes.INSERT,
+						});
+						console.log(media[i]["nama"]);
+					}
+				}
+				// end of media promosi
+
+				// save crops
+				let crops = req.body.crops;
+				const schemacrops = Joi.object({
+					CROPS: Joi.string().required(),
+				}).options({
+					allowUnknown: false,
+				});
+				if (crops !== undefined) {
+					for (let i = 0; i < crops.length; i++) {
+						if (schemacrops.validate(crops[i]).error) {
+							throw new Error(schemacrops.validate(crops[i]).error);
+						}
+						const sqlcrops =
+							"INSERT INTO SXT01D(ID1,CROPS,TGL_INPUT) VALUES('" +
+							req.body.ID1 +
+							"','" +
+							crops[i]["CROPS"] +
+							"',GETDATE())";
+						sequelize.query(sqlcrops, {
+							type: sequelize.QueryTypes.INSERT,
+						});
+					}
+				}
+				// end of save crops
+
+				// save image
+				let image = req.body.image;
+				if (image !== undefined) {
+					for (let i = 0; i < image.length; i++) {
+						let imagefilename = global.uploadBase64Image(image[i]);
+
+						const sqlcrops =
+							"INSERT INTO SXT01E(ID1,PHOTO,TGL_INPUT,USER_INPUT) VALUES('" +
+							req.body.ID1 +
+							"','" +
+							imagefilename +
+							"',GETDATE(),'" +
+							req.user.IDK +
+							"')";
+						sequelize.query(sqlcrops, {
+							type: sequelize.QueryTypes.INSERT,
+						});
+					}
+				}
+				// end of image
+
+				res.json(global.getStandardResponse(0, "success : finish status kegiatan", null));
+			});
+		}
+		catch (err) {
+			res.status(500).json(global.getStandardResponse(500, "API error : " + err.message, null));
 		}
 	},
 	ViewDetailtKegiatanByVisitId: async (req, res) => {
