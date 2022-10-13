@@ -17,7 +17,7 @@ module.exports = {
 			// }
 
             const [results, metadata] = await sequelize.query(
-				"select B.* from vwBRG_CUST A LEFT JOIN vwSTF02 B ON A.BRG = B.BRG WHERE A.CUST ='" + req.CUST + "'",
+				"select B.* from vwBRG_CUST A LEFT JOIN vwSTF02 B ON A.BRG = B.BRG WHERE A.CUST ='" + req.body.CUST + "'",
 			);
 			res.json(global.getStandardResponse(0, "success", results));
         }
