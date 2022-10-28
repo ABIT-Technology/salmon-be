@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
 			message: validate.error.message,
 		});
 	}
-	console.log(new Date(req.query.TGL).setUTCHours(00, 00, 00, 000).toString());
+
 	try {
 		const attendance = await SXT05.findAll({
 			where: {
