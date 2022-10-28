@@ -6,6 +6,7 @@ const getAll = require("./getAll");
 const getProfile = require("./getProfile");
 const getOtherProfile = require("./getOtherProfile");
 const initStartData = require("./initStartData");
+const trackLocation = require("./trackLocation");
 
 module.exports = {
 	login,
@@ -16,4 +17,5 @@ module.exports = {
 	getProfile,
 	getOtherProfile,
 	initStartData,
+	trackLocation,
 };

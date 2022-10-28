@@ -31,20 +31,7 @@ module.exports = async (req, res) => {
 		});
 	}
 
-	const {
-		SALMON2_ID,
-		ACC_NO,
-		LAT_,
-		LONG_,
-		COURSE,
-		SPEED,
-		TGL,
-		SIGNAL,
-		BATTERY,
-		ALTITUDE,
-		ACCURATE,
-		LOKASI,
-	} = req.body;
+	const { SALMON2_ID, ACC_NO } = req.body;
 
 	try {
 		const [results, metadata] = await sequelize.query(
@@ -58,32 +45,8 @@ module.exports = async (req, res) => {
 			});
 		}
 
-		// await LOGINSALMON2.create({
-		// 	DEVICE_ID,
-		// 	ACC_NO,
-		// 	LAT_,
-		// 	LONG_,
-		// 	COURSE,
-		// 	SPEED,
-		// 	TGL,
-		// 	SIGNAL,
-		// 	BATTERY,
-		// 	ALTITUDE,
-		// 	ACCURATE,
-		// 	LOKASI,
-		// 	IDK: user.IDK,
-		// });
-		console.log(req.logger);
 		const sql = `UPDATE SBF01X SET ACC_NO = '${ACC_NO}', SALMON2_ID = '${SALMON2_ID}', VALID=1 WHERE ID1 = ${req.logger.ID1};`;
 		await sequelize.query(sql, { type: sequelize.QueryTypes.UPDATE });
-		// await SBF01X.update(
-		// 	{
-		// 		VALID: true,
-		// 	},
-		// 	{
-		// 		where: { ID1: req.logger.ID1 },
-		// 	},
-		// );
 
 		const accessToken = createJWTToken(
 			{ IDK: results[0].IDK },

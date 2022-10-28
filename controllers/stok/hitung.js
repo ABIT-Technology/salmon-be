@@ -2,68 +2,79 @@ const Joi = require("joi");
 const sequelize = require("../../config/configdb");
 const global = require("../../config/global");
 const { SBF01A } = require("../../models");
-
+const sequelizeSBOX = require("../../config/configdb2");
 
 module.exports = {
-    HitungStok: async (req, res) => {
+	HitungStok: async (req, res) => {
+		const schema = Joi.object({
+			TGL: Joi.string().required(),
+			CUST: Joi.string().required(),
+			LAT_: Joi.number().required(),
+			LONG_: Joi.number().required(),
+			COURSE: Joi.number().required(),
+			TGL_INPUT: Joi.string().required(),
+			SIGNAL: Joi.number().required(),
+			BATTERY: Joi.number().required(),
+			TYPE: Joi.string().required(),
+			ALTITUDE: Joi.number().required(),
+			ACCURATE: Joi.number().required(),
+			LOKASI: Joi.string().required(),
+			BRG: Joi.array().allow(null, ""),
+		}).options({
+			allowUnknown: false,
+		});
 
-        const schema = Joi.object({
-            TGL: Joi.string().required(),
-            CUST: Joi.string().required(),
-            LAT_: Joi.number().required(),
-            LONG_: Joi.number().required(),
-            COURSE: Joi.number().required(),
-            TGL_INPUT: Joi.string().required(),
-            SIGNAL: Joi.number().required(),
-            BATTERY: Joi.number().required(),
-            TYPE: Joi.string().required(),
-            ALTITUDE: Joi.number().required(),
-            ACCURATE: Joi.number().required(),
-            LOKASI: Joi.string().required(),
-            BRG: Joi.array().allow(null, "")
-        }).options({
-            allowUnknown: false,
-        });
+		const [user, metadata] = await sequelizeSBOX.query(
+			`SELECT * FROM SBF01A WHERE IDK = '${req.user.IDK}';`,
+		);
 
-        const user = await SBF01A.findOne({
-            where: { IDK: req.user.IDK },
-            raw: true,
-        });
+		if (user.length <= 0) {
+			return res.status(404).send({
+				code: 404,
+				message: "User not authorized",
+			});
+		}
 
-        if (!user) {
-            return res.status(409).send({
-                code: 409,
-                message: "User not authorized",
-            });
-        }
+		const t = await sequelize.transaction();
+		const validate = schema.validate(req.body);
+		if (validate.error) {
+			return res.status(400).send({
+				code: 400,
+				message: validate.error.message,
+			});
+		}
+		try {
+			const sqlprod =
+				"INSERT INTO SXT03A(TGL,CUST,IDK,LAT_,LONG_,COURSE,TGL_INPUT,SIGNAL,BATTERY,TYPE,ALTITUDE,ACCURATE,LOKASI) VALUES(" +
+				"'" +
+				req.body.TGL +
+				"','" +
+				req.body.CUST +
+				"','" +
+				req.user.IDK +
+				"','" +
+				req.body.LAT_ +
+				"','" +
+				req.body.LONG_ +
+				"','" +
+				req.body.COURSE +
+				"','" +
+				req.body.TGL_INPUT +
+				"','" +
+				req.body.SIGNAL +
+				"','" +
+				req.body.BATTERY +
+				"','" +
+				req.body.TYPE +
+				"','" +
+				req.body.ALTITUDE +
+				"','" +
+				req.body.ACCURATE +
+				"','" +
+				req.body.LOKASI +
+				"')";
 
-        const t = await sequelize.transaction();
-        const validate = schema.validate(req.body);
-        if (validate.error) {
-            return res.status(400).send({
-                code: 400,
-                message: validate.error.message,
-            });
-        }
-        try {
-
-            const sqlprod = "INSERT INTO SXT03A(TGL,CUST,IDK,LAT_,LONG_,COURSE,TGL_INPUT,SIGNAL,BATTERY,TYPE,ALTITUDE,ACCURATE,LOKASI) VALUES("
-                + "'" + req.body.TGL
-                + "','" + req.body.CUST
-                + "','" + req.user.IDK
-                + "','" + req.body.LAT_
-                + "','" + req.body.LONG_ 
-                + "','" + req.body.COURSE 
-                + "','" + req.body.TGL_INPUT 
-                + "','" + req.body.SIGNAL 
-                + "','" + req.body.BATTERY 
-                + "','" + req.body.TYPE 
-                + "','" + req.body.ALTITUDE 
-                + "','" + req.body.ACCURATE 
-                + "','" + req.body.LOKASI 
-                + "')";
-            
-                let header = await sequelize
+			let header = await sequelize
 				.query(sqlprod, {
 					type: sequelize.QueryTypes.INSERT,
 				})
@@ -75,17 +86,16 @@ module.exports = {
 					);
 					if (results2 != null) {
 						return results2;
-						// console.log(results2);
 					}
 				});
 			let headerid = header[0][0]["ID1"];
 
-            // save product
+			// save product
 			let BRG = req.body.BRG;
 			const schemabarang = Joi.object({
 				BRG: Joi.string().required(),
 				STN: Joi.number().required(),
-                QTY: Joi.number().required(),
+				QTY: Joi.number().required(),
 			}).options({
 				allowUnknown: false,
 			});
@@ -110,13 +120,18 @@ module.exports = {
 				}
 			}
 			// end of save product
-            
-            await t.commit();
-            res.json(global.getStandardResponse(0, "success : hitung stok saved", null));
-        }
-        catch (err) {
-            await t.rollback();
-            res.status(500).json(global.getStandardResponse(500, "API error : " + err.message, null));
-        }
-    }
+
+			await t.commit();
+			res.json(
+				global.getStandardResponse(0, "success : hitung stok saved", null),
+			);
+		} catch (err) {
+			await t.rollback();
+			res
+				.status(500)
+				.json(
+					global.getStandardResponse(500, "API error : " + err.message, null),
+				);
+		}
+	},
 };

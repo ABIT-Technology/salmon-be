@@ -4,6 +4,7 @@ const kegiatanController = require("./kegiatan");
 const proyekController = require("./proyek");
 const monitoringController = require("./monitoring");
 const stokController = require("./stok");
+const notificationController = require("./notification");
 
 module.exports = {
 	userController,
@@ -11,5 +12,6 @@ module.exports = {
 	kegiatanController,
 	proyekController,
 	monitoringController,
-	stokController
+	stokController,
+	notificationController,
 };

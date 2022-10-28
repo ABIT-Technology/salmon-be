@@ -53,7 +53,6 @@ module.exports = async (req, res) => {
 		// );
 		res.json(global.getStandardResponse(0, "success", results2));
 	} catch (err) {
-		console.log(err);
 		res.status(500).json(global.getStandardResponse(500, "API error", null));
 	}
 };

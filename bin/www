@@ -30,9 +30,7 @@ const io = new Server(server);
 io.on("connection", (socket) => {
 	console.log("a user connected", { id: socket.id });
 	socket.emit("online", { online: true });
-	socket.on("message", (data) => {
-		console.log(data);
-	});
+	socket.on("message", (data) => {});
 });
 server.listen(port);
 server.on("error", onError);
