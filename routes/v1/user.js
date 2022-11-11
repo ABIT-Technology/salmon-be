@@ -13,5 +13,6 @@ router.post("/check-active-status", authJwt, userController.checkActiveStatus);
 router.post("/login", logger.login, userController.login);
 router.post("/create", userController.create);
 router.post("/track-location", authJwt, userController.trackLocation);
+router.post("/camera-location", authJwt, userController.cameraLocation);
 
 module.exports = router;

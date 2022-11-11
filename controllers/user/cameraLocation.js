@@ -1,6 +1,7 @@
 const Joi = require("joi");
-const { SXT05 } = require("../../models");
-const sequelize = require("../../config/configdb2");
+const sequelizeSBOX = require("../../config/configdb2");
+const sequelize = require("../../config/configdb");
+const global = require("../../config/global");
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
@@ -11,13 +12,9 @@ module.exports = async (req, res) => {
 		TGL: Joi.string().required(),
 		SIGNAL: Joi.number().allow(null).required(),
 		BATTERY: Joi.number().required(),
-		KET: Joi.string().required().allow(null, ""),
-		COY_ID: Joi.string().required().allow(null, ""),
-		VISIT_ID: Joi.string().required().allow(null, ""),
 		ALTITUDE: Joi.number().required(),
 		ACCURATE: Joi.number().required(),
-		CUST: Joi.string().required().allow(null, ""),
-		LOKASI: Joi.string().allow(null, "").required(),
+		PHOTO: Joi.string().required(),
 	}).options({
 		allowUnknown: false,
 	});
@@ -32,8 +29,8 @@ module.exports = async (req, res) => {
 	}
 
 	try {
-		const [results, metadata] = await sequelize.query(
-			`SELECT * FROM SBF01A WHERE AKTIF = ${1} AND IDK = '${req.user.IDK}';`,
+		const [results, metadata] = await sequelizeSBOX.query(
+			`SELECT * FROM SBF01A WHERE IDK = '${req.user.IDK}';`,
 		);
 
 		if (results.length <= 0) {
@@ -42,11 +39,16 @@ module.exports = async (req, res) => {
 				message: "User not found",
 			});
 		}
+		let imagefilename = global.uploadBase64Image({ string: req.body.PHOTO });
 
-		req.body.IDK = req.user.IDK;
-		req.body.TYPE = 1;
-
-		await SXT05.create(req.body);
+		const sql = `INSERT INTO SXT04(IDK,LAT_,LONG_,COURSE,SPEED,TGL,SIGNAL,BATTERY,ALTITUDE,ACCURATE,PHOTO) 
+				values('${req.user.IDK}','${req.body.LAT_}','${req.body.LONG_}',
+				'${req.body.COURSE}','${req.body.SPEED}','${req.body.TGL}',
+				'${req.body.SIGNAL}','${req.body.BATTERY}','${req.body.ALTITUDE}',
+				'${req.body.ACCURATE}','${imagefilename}');`;
+		await sequelize.query(sql, {
+			type: sequelize.QueryTypes.INSERT,
+		});
 
 		return res.send({
 			code: 0,

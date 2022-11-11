@@ -54,6 +54,8 @@ module.exports = {
 					req.body.nama +
 					"%' AND COY_ID = '" +
 					COY_ID +
+					"' AND WIL = '" +
+					results2[0][0]["WIL2"] +
 					"'",
 			);
 			res.json(global.getStandardResponse(0, "success", results));

@@ -47,12 +47,12 @@ module.exports = async (req, res) => {
 			type: sequelize.QueryTypes.INSERT,
 		});
 
-		res.send({
+		return res.send({
 			code: 0,
 			message: "Success",
 		});
 	} catch (err) {
-		res.status(400).send({
+		return res.status(400).send({
 			code: 400,
 			message: err.message || "Server API Error",
 		});

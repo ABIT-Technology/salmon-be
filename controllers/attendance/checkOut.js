@@ -62,13 +62,13 @@ module.exports = async (req, res) => {
 
 		await SXT05.create(req.body);
 		await t.commit();
-		res.send({
+		return res.send({
 			code: 0,
 			message: "Success",
 		});
 	} catch (err) {
 		await t.rollback();
-		res.status(400).send({
+		return res.status(400).send({
 			code: 400,
 			message: err.message || "Server API Error",
 		});
