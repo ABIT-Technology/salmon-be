@@ -2,6 +2,7 @@ const Joi = require("joi");
 const sequelize = require("../../config/configdb");
 const global = require("../../config/global");
 const sequelizeSBOX = require("../../config/configdb2");
+const { startOfDay } = require("date-fns");
 
 module.exports = {
 	SubmitKegiatan: async (req, res) => {
@@ -26,6 +27,8 @@ module.exports = {
 			media: Joi.array().allow(null, ""),
 			image: Joi.array().required(),
 			ID1_REF: Joi.string().allow(null, ""),
+			MID1: Joi.string(),
+			MID1_REF: Joi.string().allow(null, ""),
 			STATUS: Joi.boolean().allow(null, ""),
 		}).options({
 			allowUnknown: false,
@@ -127,9 +130,10 @@ module.exports = {
 			// 	"," +
 			// 	status +
 			// 	")";
+			req.body.TGL = startOfDay(new Date(req.body.TGL)).toLocaleDateString();
 			const sql =
 				"INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,ID_,VISIT_ID,TYPE,ALTITUDE" +
-				",ACCURATE,CUST,LOKASI,ID1_REF,STATUS) values('" +
+				",ACCURATE,CUST,LOKASI,ID1_REF,MID1,MID1_REF,STATUS) values('" +
 				req.user.IDK +
 				"','" +
 				req.body.LAT_ +
@@ -161,7 +165,13 @@ module.exports = {
 				req.body.LOKASI +
 				"'," +
 				(ID1_REF == null || ID1_REF == "" ? "NULL" : ID1_REF) +
-				"," +
+				",'" +
+				req.body.MID1 +
+				"','" +
+				(req.body.MID1_REF == null || req.body.MID1_REF == ""
+					? "NULL"
+					: req.body.MID1_REF) +
+				"'," +
 				status +
 				")";
 			let header = await sequelize
@@ -285,10 +295,13 @@ module.exports = {
 			// end of image
 
 			await t.commit();
-			res.json(global.getStandardResponse(0, "success : kegiatan saved", null));
+			return res.json(
+				global.getStandardResponse(0, "success : kegiatan saved", null),
+			);
 		} catch (err) {
+			console.log(err);
 			await t.rollback();
-			res
+			return res
 				.status(500)
 				.json(
 					global.getStandardResponse(500, "API error : " + err.message, null),
