@@ -2,6 +2,7 @@ const Joi = require("joi");
 const sequelize = require("../../config/configdb");
 const global = require("../../config/global");
 const { SBF01A } = require("../../models");
+const sequelizeSBOX = require("../../config/configdb2");
 
 module.exports = {
 	SubmitProyek: async (req, res) => {
@@ -25,6 +26,8 @@ module.exports = {
 			media: Joi.array().allow(null, ""),
 			image: Joi.array().required(),
 			ID3_REF: Joi.number().allow(null, ""),
+			MID3: Joi.string().required(),
+			MID3_REF: Joi.string().allow(null, ""),
 			STATUS: Joi.boolean().allow(null, ""),
 		}).options({
 			allowUnknown: false,
@@ -39,15 +42,14 @@ module.exports = {
 			});
 		}
 
-		const user = await SBF01A.findOne({
-			where: { IDK: req.user.IDK },
-			raw: true,
-		});
+		const [results1, metadata1] = await sequelizeSBOX.query(
+			`SELECT * FROM SBF01A WHERE IDK = ${req.user.IDK};`,
+		);
 
-		if (!user) {
-			return res.status(409).send({
-				code: 409,
-				message: "User not authorized",
+		if (results1.length <= 0) {
+			return res.status(404).send({
+				code: 404,
+				message: "User not found",
 			});
 		}
 
@@ -107,7 +109,7 @@ module.exports = {
 			let COY_ID = 0;
 
 			const [results, metadata] = await sequelize.query(
-				"SELECT TOP 1 * FROM ABF02A WHERE AKTIF = 1 AND IDK='" +
+				"SELECT TOP 1 * FROM vwABF02A WHERE AKTIF = 1 AND IDK='" +
 					req.user.IDK +
 					"'",
 			);
@@ -118,7 +120,7 @@ module.exports = {
 			// save table header transaksi kegiatan
 			const sql =
 				"INSERT INTO SXT02C(ID1,IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,COY_ID,VISIT_ID,TYPE,ALTITUDE" +
-				",ACCURATE,LOKASI,ID3_REF,STATUS) values(" +
+				",ACCURATE,LOKASI,ID3_REF,MID3,MID3_REF,STATUS) values(" +
 				(ID1_REF == null ? "NULL" : ID1_REF) +
 				",'" +
 				req.user.IDK +
@@ -150,8 +152,14 @@ module.exports = {
 				req.body.LOKASI +
 				"'," +
 				(ID3_REF == null ? "NULL" : ID3_REF) +
-				"," +
-				status +
+				",'" +
+				req.body.MID3 +
+				"','" +
+				(req.body.MID3_REF == null || req.body.MID3_REF == ""
+					? "NULL"
+					: req.body.MID3_REF) +
+				"'," +
+				req.body.STATUS +
 				")";
 			let header = await sequelize
 				.query(sql, {
@@ -284,6 +292,7 @@ module.exports = {
 			await t.commit();
 			res.json(global.getStandardResponse(0, "success : proyek saved", null));
 		} catch (err) {
+			console.log(err.message);
 			await t.rollback();
 			res
 				.status(500)
