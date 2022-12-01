@@ -62,7 +62,6 @@ module.exports = {
 				if (req.body.STATUS) {
 					const resvisitid = await sequelize.query(
 						"select DEF_CHECKOUT from SXFSYS WHERE BLN = MONTH(GETDATE()) AND THN = YEAR(GETDATE())",
-						{ transaction: t },
 					);
 					try {
 						VISIT_ID = resvisitid[0][0].DEF_CHECKOUT;
@@ -72,17 +71,14 @@ module.exports = {
 			}
 
 			let ID1_REF = null;
-			// ID_REF tidak terpakai lagi, default null
-
-			// if (req.body.ID1_REF != undefined) {
-			// 	const reskegiatan = await sequelize.query(
-			// 		"SELECT TOP 1 * FROM SXT01A WHERE ID1='" + req.body.ID1_REF + "'",
-			// 		{ transaction: t },
-			// 	);
-			// 	if (reskegiatan != null) {
-			// 		ID1_REF = req.body.ID1_REF;
-			// 	}
-			// }
+			if (req.body.ID1_REF != undefined) {
+				const reskegiatan = await sequelize.query(
+					"SELECT TOP 1 * FROM SXT01A WHERE ID1='" + req.body.ID1_REF + "'",
+				);
+				if (reskegiatan != null) {
+					ID1_REF = req.body.ID1_REF;
+				}
+			}
 			// GET COY_ID from current login user
 			let COY_ID = 0;
 
@@ -90,7 +86,6 @@ module.exports = {
 				"SELECT TOP 1 * FROM vwABF02A WHERE AKTIF = 1 AND IDK='" +
 					req.user.IDK +
 					"'",
-				{ transaction: t },
 			);
 
 			if (results != null) {
@@ -175,20 +170,17 @@ module.exports = {
 					? "NULL"
 					: req.body.MID1_REF) +
 				"'," +
-				1 +
+				req.body.STATUS +
 				")";
 			let header = await sequelize
 				.query(sql, {
-					type: sequelize.QueryTypes.INSERT,
-					transaction: t,
+					type: sequelize.QueryTypes.INSERT, transaction: t
 				})
-				.then(async function () {
-					const results2 = await sequelize.query(
-						// "SELECT SCOPE_IDENTITY() AS ID1",
+				.then(function () {
+					const results2 = sequelize.query(
 						"SELECT TOP 1 * FROM SXT01A WHERE IDK = '" +
 							req.user.IDK +
 							"' ORDER BY ID1 DESC",
-						{ transaction: t },
 					);
 					if (results2 != null) {
 						return results2;
@@ -219,10 +211,10 @@ module.exports = {
 						"','" +
 						product[i]["QTY"] +
 						"','" +
-						2 +
+						product[i]["STN"] +
 						"',GETDATE())";
-					sequelize.query(sqlprod, {
-						type: sequelize.QueryTypes.INSERT,
+						await sequelize.query(sqlprod, {
+						type: sequelize.QueryTypes.INSERT, transaction: t
 					});
 				}
 			}
@@ -249,8 +241,8 @@ module.exports = {
 						"','" +
 						media[i]["QTY"] +
 						"',GETDATE())";
-					sequelize.query(sqlmedia, {
-						type: sequelize.QueryTypes.INSERT,
+						await sequelize.query(sqlmedia, {
+						type: sequelize.QueryTypes.INSERT, transaction: t
 					});
 				}
 			}
@@ -274,8 +266,8 @@ module.exports = {
 						"','" +
 						crops[i]["CROPS"] +
 						"',GETDATE())";
-					sequelize.query(sqlcrops, {
-						type: sequelize.QueryTypes.INSERT,
+						await sequelize.query(sqlcrops, {
+						type: sequelize.QueryTypes.INSERT, transaction: t
 					});
 				}
 			}
@@ -294,8 +286,8 @@ module.exports = {
 					"',GETDATE(),'" +
 					req.user.IDK +
 					"')";
-				sequelize.query(sqlcrops, {
-					type: sequelize.QueryTypes.INSERT,
+					await sequelize.query(sqlcrops, {
+					type: sequelize.QueryTypes.INSERT, transaction: t
 				});
 			}
 			// end of image
@@ -502,7 +494,7 @@ module.exports = {
 								"','" +
 								product[i]["QTY"] +
 								"','" +
-								2 +
+								product[i]["STN"] +
 								"',GETDATE())";
 							sequelize.query(sqlprod, {
 								type: sequelize.QueryTypes.INSERT,

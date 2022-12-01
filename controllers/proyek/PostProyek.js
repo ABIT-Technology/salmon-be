@@ -163,7 +163,7 @@ module.exports = {
 				")";
 			let header = await sequelize
 				.query(sql, {
-					type: sequelize.QueryTypes.INSERT,
+					type: sequelize.QueryTypes.INSERT, transaction: t
 				})
 				.then(function () {
 					const results2 = sequelize.query(
@@ -202,8 +202,8 @@ module.exports = {
 						"','" +
 						2 +
 						"',GETDATE())";
-					sequelize.query(sqlprod, {
-						type: sequelize.QueryTypes.INSERT,
+					await sequelize.query(sqlprod, {
+						type: sequelize.QueryTypes.INSERT, transaction: t
 					});
 				}
 			}
@@ -232,8 +232,8 @@ module.exports = {
 						"','" +
 						media[i]["QTY"] +
 						"',GETDATE())";
-					sequelize.query(sqlmedia, {
-						type: sequelize.QueryTypes.INSERT,
+					await sequelize.query(sqlmedia, {
+						type: sequelize.QueryTypes.INSERT, transaction: t
 					});
 				}
 			}
@@ -259,8 +259,8 @@ module.exports = {
 						"','" +
 						crops[i]["CROPS"] +
 						"',GETDATE())";
-					sequelize.query(sqlcrops, {
-						type: sequelize.QueryTypes.INSERT,
+					await sequelize.query(sqlcrops, {
+						type: sequelize.QueryTypes.INSERT, transaction: t
 					});
 				}
 			}
@@ -282,8 +282,8 @@ module.exports = {
 						"',GETDATE(),'" +
 						req.user.IDK +
 						"')";
-					sequelize.query(sqlcrops, {
-						type: sequelize.QueryTypes.INSERT,
+					await sequelize.query(sqlcrops, {
+						type: sequelize.QueryTypes.INSERT, transaction: t
 					});
 				}
 			}
