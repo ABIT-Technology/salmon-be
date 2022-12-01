@@ -62,6 +62,7 @@ module.exports = {
 				if (req.body.STATUS) {
 					const resvisitid = await sequelize.query(
 						"select DEF_CHECKOUT from SXFSYS WHERE BLN = MONTH(GETDATE()) AND THN = YEAR(GETDATE())",
+						{ transaction: t },
 					);
 					try {
 						VISIT_ID = resvisitid[0][0].DEF_CHECKOUT;
@@ -71,14 +72,17 @@ module.exports = {
 			}
 
 			let ID1_REF = null;
-			if (req.body.ID1_REF != undefined) {
-				const reskegiatan = await sequelize.query(
-					"SELECT TOP 1 * FROM SXT01A WHERE ID1='" + req.body.ID1_REF + "'",
-				);
-				if (reskegiatan != null) {
-					ID1_REF = req.body.ID1_REF;
-				}
-			}
+			// ID_REF tidak terpakai lagi, default null
+
+			// if (req.body.ID1_REF != undefined) {
+			// 	const reskegiatan = await sequelize.query(
+			// 		"SELECT TOP 1 * FROM SXT01A WHERE ID1='" + req.body.ID1_REF + "'",
+			// 		{ transaction: t },
+			// 	);
+			// 	if (reskegiatan != null) {
+			// 		ID1_REF = req.body.ID1_REF;
+			// 	}
+			// }
 			// GET COY_ID from current login user
 			let COY_ID = 0;
 
@@ -86,6 +90,7 @@ module.exports = {
 				"SELECT TOP 1 * FROM vwABF02A WHERE AKTIF = 1 AND IDK='" +
 					req.user.IDK +
 					"'",
+				{ transaction: t },
 			);
 
 			if (results != null) {
@@ -172,17 +177,20 @@ module.exports = {
 					? "NULL"
 					: req.body.MID1_REF) +
 				"'," +
-				req.body.STATUS +
+				1 +
 				")";
 			let header = await sequelize
 				.query(sql, {
 					type: sequelize.QueryTypes.INSERT,
+					transaction: t,
 				})
-				.then(function () {
-					const results2 = sequelize.query(
+				.then(async function () {
+					const results2 = await sequelize.query(
+						// "SELECT SCOPE_IDENTITY() AS ID1",
 						"SELECT TOP 1 * FROM SXT01A WHERE IDK = '" +
 							req.user.IDK +
 							"' ORDER BY ID1 DESC",
+						{ transaction: t },
 					);
 					if (results2 != null) {
 						return results2;
@@ -213,7 +221,7 @@ module.exports = {
 						"','" +
 						product[i]["QTY"] +
 						"','" +
-						product[i]["STN"] +
+						2 +
 						"',GETDATE())";
 					sequelize.query(sqlprod, {
 						type: sequelize.QueryTypes.INSERT,
@@ -496,7 +504,7 @@ module.exports = {
 								"','" +
 								product[i]["QTY"] +
 								"','" +
-								product[i]["STN"] +
+								2 +
 								"',GETDATE())";
 							sequelize.query(sqlprod, {
 								type: sequelize.QueryTypes.INSERT,

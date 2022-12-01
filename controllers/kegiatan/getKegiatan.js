@@ -33,7 +33,8 @@ module.exports = async (req, res) => {
 		// );
 
 		const [results, metadata] = await sequelize.query(
-			"SELECT * FROM SXF03 WHERE ISNULL(KEGIATAN,0) = 1 AND ISNULL(AKTIF,0) = 1",
+			`SELECT * FROM SXF03 WHERE ISNULL(KEGIATAN,0) = 1 AND ISNULL(AKTIF,0) = 1 
+			ORDER BY KET ASC;`,
 		);
 		res.json(global.getStandardResponse(0, "success", results));
 	} catch (err) {

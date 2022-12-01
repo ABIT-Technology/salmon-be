@@ -20,7 +20,7 @@ module.exports = {
 			const path = "./public/upload/images/" + filename + ".jpg";
 			const imgdata = images["string"];
 
-			fs.mkdirSync("./public/upload/images", { recursive: true });
+			// fs.mkdirSync("./public/upload/images", { recursive: true });
 			// to convert base64 format into random filename
 			const base64Data = imgdata.replace(/^data:([A-Za-z-+/]+);base64,/, "");
 

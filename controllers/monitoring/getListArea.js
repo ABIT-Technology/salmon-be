@@ -4,7 +4,12 @@ const global = require("../../config/global");
 module.exports = async (req, res) => {
 	try {
 		const [results, metadata] = await sequelize.query(
-			"SELECT * FROM VWABF10B WHERE WIL != '00' ORDER BY ID1 ASC",
+			`SELECT
+			A.*
+			FROM vwABF10B A
+			INNER JOIN (SELECT IDK, WIL FROM sbox.dbo.SBF01E WHERE AKTIF = 1 GROUP BY IDK, WIL) 
+			B ON A.WIL = B.WIL
+			WHERE B.IDK = '${req.user.IDK}'`,
 		);
 		res.json(global.getStandardResponse(0, "success", results));
 	} catch (err) {
