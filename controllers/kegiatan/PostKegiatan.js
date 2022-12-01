@@ -27,8 +27,8 @@ module.exports = {
 			media: Joi.array().allow(null, ""),
 			image: Joi.array().required(),
 			ID1_REF: Joi.string().allow(null, ""),
-			MID1: Joi.string(),
-			MID1_REF: Joi.string().allow(null, ""),
+			MID1: Joi.string().required(),
+			MID1_REF: Joi.string().allow(null, "").required(),
 			STATUS: Joi.boolean().allow(null, ""),
 		}).options({
 			allowUnknown: false,
@@ -174,13 +174,15 @@ module.exports = {
 				")";
 			let header = await sequelize
 				.query(sql, {
-					type: sequelize.QueryTypes.INSERT, transaction: t
+					type: sequelize.QueryTypes.INSERT,
+					transaction: t,
 				})
 				.then(function () {
 					const results2 = sequelize.query(
 						"SELECT TOP 1 * FROM SXT01A WHERE IDK = '" +
 							req.user.IDK +
-							"' ORDER BY ID1 DESC", { transaction: t }
+							"' ORDER BY ID1 DESC",
+						{ transaction: t },
 					);
 					if (results2 != null) {
 						return results2;
@@ -213,8 +215,9 @@ module.exports = {
 						"','" +
 						product[i]["STN"] +
 						"',GETDATE())";
-						await sequelize.query(sqlprod, {
-						type: sequelize.QueryTypes.INSERT, transaction: t
+					await sequelize.query(sqlprod, {
+						type: sequelize.QueryTypes.INSERT,
+						transaction: t,
 					});
 				}
 			}
@@ -241,8 +244,9 @@ module.exports = {
 						"','" +
 						media[i]["QTY"] +
 						"',GETDATE())";
-						await sequelize.query(sqlmedia, {
-						type: sequelize.QueryTypes.INSERT, transaction: t
+					await sequelize.query(sqlmedia, {
+						type: sequelize.QueryTypes.INSERT,
+						transaction: t,
 					});
 				}
 			}
@@ -266,8 +270,9 @@ module.exports = {
 						"','" +
 						crops[i]["CROPS"] +
 						"',GETDATE())";
-						await sequelize.query(sqlcrops, {
-						type: sequelize.QueryTypes.INSERT, transaction: t
+					await sequelize.query(sqlcrops, {
+						type: sequelize.QueryTypes.INSERT,
+						transaction: t,
 					});
 				}
 			}
@@ -286,8 +291,9 @@ module.exports = {
 					"',GETDATE(),'" +
 					req.user.IDK +
 					"')";
-					await sequelize.query(sqlcrops, {
-					type: sequelize.QueryTypes.INSERT, transaction: t
+				await sequelize.query(sqlcrops, {
+					type: sequelize.QueryTypes.INSERT,
+					transaction: t,
 				});
 			}
 			// end of image
