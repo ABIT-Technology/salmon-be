@@ -137,7 +137,7 @@ module.exports = {
 			// 	")";
 			req.body.TGL = startOfDay(new Date(req.body.TGL)).toLocaleDateString();
 			const sql =
-				"INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,ID_,VISIT_ID,TYPE,ALTITUDE" +
+				"INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,VISIT_ID,TYPE,ALTITUDE" +
 				",ACCURATE,CUST,LOKASI,ID1_REF,MID1,MID1_REF,STATUS) values('" +
 				req.user.IDK +
 				"','" +
@@ -157,8 +157,6 @@ module.exports = {
 				"'," +
 				(req.body.KET == null ? "NULL" : "'" + req.body.KET + "'") +
 				",'" +
-				COY_ID +
-				"','" +
 				(VISIT_ID == 0 ? req.body.VISIT_ID : VISIT_ID) +
 				"',0,'" +
 				req.body.ALTITUDE +
