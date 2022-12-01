@@ -170,7 +170,7 @@ module.exports = {
 					? "NULL"
 					: req.body.MID1_REF) +
 				"'," +
-				req.body.STATUS +
+				1 +
 				")";
 			let header = await sequelize
 				.query(sql, {
