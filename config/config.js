@@ -15,6 +15,7 @@ module.exports = {
 			options: {
 				encrypt: false,
 				enableArithAbort: false,
+				requestTimeout: 60000,
 			},
 		},
 	},
@@ -30,6 +31,7 @@ module.exports = {
 			options: {
 				encrypt: false,
 				enableArithAbort: false,
+				requestTimeout: 60000,
 			},
 		},
 	},
@@ -45,6 +47,7 @@ module.exports = {
 			options: {
 				encrypt: false,
 				enableArithAbort: false,
+				requestTimeout: 60000,
 			},
 		},
 	},

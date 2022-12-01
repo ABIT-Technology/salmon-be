@@ -159,7 +159,7 @@ module.exports = {
 					? "NULL"
 					: req.body.MID3_REF) +
 				"'," +
-				req.body.STATUS +
+				1 +
 				")";
 			let header = await sequelize
 				.query(sql, {
@@ -181,7 +181,7 @@ module.exports = {
 			const schemaproduct = Joi.object({
 				BRG: Joi.string().required(),
 				QTY: Joi.number().required(),
-				STN: Joi.number().required(),
+				STN: Joi.string().required(),
 			}).options({
 				allowUnknown: false,
 			});
@@ -200,7 +200,7 @@ module.exports = {
 						"','" +
 						product[i]["QTY"] +
 						"','" +
-						product[i]["STN"] +
+						2 +
 						"',GETDATE())";
 					sequelize.query(sqlprod, {
 						type: sequelize.QueryTypes.INSERT,
@@ -292,7 +292,6 @@ module.exports = {
 			await t.commit();
 			res.json(global.getStandardResponse(0, "success : proyek saved", null));
 		} catch (err) {
-			console.log(err.message);
 			await t.rollback();
 			res
 				.status(500)
@@ -496,7 +495,7 @@ module.exports = {
 					const schemaproduct = Joi.object({
 						BRG: Joi.string().required(),
 						QTY: Joi.number().required(),
-						STN: Joi.number().required(),
+						STN: Joi.string().required(),
 					}).options({
 						allowUnknown: false,
 					});
@@ -515,7 +514,7 @@ module.exports = {
 								"','" +
 								product[i]["QTY"] +
 								"','" +
-								product[i]["STN"] +
+								2 +
 								"',GETDATE())";
 							sequelize.query(sqlprod, {
 								type: sequelize.QueryTypes.INSERT,
