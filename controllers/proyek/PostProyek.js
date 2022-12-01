@@ -163,11 +163,13 @@ module.exports = {
 				")";
 			let header = await sequelize
 				.query(sql, {
-					type: sequelize.QueryTypes.INSERT, transaction: t
+					type: sequelize.QueryTypes.INSERT,
+					transaction: t,
 				})
 				.then(function () {
 					const results2 = sequelize.query(
-						"SELECT TOP 1 * FROM SXT02C ORDER BY ID3 DESC", { transaction: t }
+						"SELECT TOP 1 * FROM SXT02C ORDER BY ID3 DESC",
+						{ transaction: t },
 					);
 					if (results2 != null) {
 						return results2;
@@ -181,7 +183,7 @@ module.exports = {
 			const schemaproduct = Joi.object({
 				BRG: Joi.string().required(),
 				QTY: Joi.number().required(),
-				STN: Joi.string().required(),
+				STN: Joi.number().required(),
 			}).options({
 				allowUnknown: false,
 			});
@@ -203,7 +205,8 @@ module.exports = {
 						2 +
 						"',GETDATE())";
 					await sequelize.query(sqlprod, {
-						type: sequelize.QueryTypes.INSERT, transaction: t
+						type: sequelize.QueryTypes.INSERT,
+						transaction: t,
 					});
 				}
 			}
@@ -233,7 +236,8 @@ module.exports = {
 						media[i]["QTY"] +
 						"',GETDATE())";
 					await sequelize.query(sqlmedia, {
-						type: sequelize.QueryTypes.INSERT, transaction: t
+						type: sequelize.QueryTypes.INSERT,
+						transaction: t,
 					});
 				}
 			}
@@ -260,7 +264,8 @@ module.exports = {
 						crops[i]["CROPS"] +
 						"',GETDATE())";
 					await sequelize.query(sqlcrops, {
-						type: sequelize.QueryTypes.INSERT, transaction: t
+						type: sequelize.QueryTypes.INSERT,
+						transaction: t,
 					});
 				}
 			}
@@ -283,7 +288,8 @@ module.exports = {
 						req.user.IDK +
 						"')";
 					await sequelize.query(sqlcrops, {
-						type: sequelize.QueryTypes.INSERT, transaction: t
+						type: sequelize.QueryTypes.INSERT,
+						transaction: t,
 					});
 				}
 			}
@@ -495,7 +501,7 @@ module.exports = {
 					const schemaproduct = Joi.object({
 						BRG: Joi.string().required(),
 						QTY: Joi.number().required(),
-						STN: Joi.string().required(),
+						STN: Joi.number().required(),
 					}).options({
 						allowUnknown: false,
 					});
