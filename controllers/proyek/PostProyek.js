@@ -167,7 +167,7 @@ module.exports = {
 				})
 				.then(function () {
 					const results2 = sequelize.query(
-						"SELECT TOP 1 * FROM SXT02C ORDER BY ID3 DESC",
+						"SELECT TOP 1 * FROM SXT02C ORDER BY ID3 DESC", { transaction: t }
 					);
 					if (results2 != null) {
 						return results2;

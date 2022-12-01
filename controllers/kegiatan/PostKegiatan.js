@@ -180,7 +180,7 @@ module.exports = {
 					const results2 = sequelize.query(
 						"SELECT TOP 1 * FROM SXT01A WHERE IDK = '" +
 							req.user.IDK +
-							"' ORDER BY ID1 DESC",
+							"' ORDER BY ID1 DESC", { transaction: t }
 					);
 					if (results2 != null) {
 						return results2;
