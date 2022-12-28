@@ -6,6 +6,28 @@ const { startOfDay } = require("date-fns");
 
 module.exports = {
 	SubmitKegiatan: async (req, res) => {
+		// if (req.user.IDK === 220084) {
+		// 	const sqlTemp =
+		// 		"INSERT INTO TEMP_MANUAL_DATA(IDK,MAIN_DATA,DATA_TYPE,URL,TGL_INPUT) values('" +
+		// 		req.user.IDK +
+		// 		"', '" +
+		// 		JSON.stringify(req.body) +
+		// 		"','" +
+		// 		"Submit Kegiatan" +
+		// 		"','" +
+		// 		req.url +
+		// 		"',GETDATE(),'" +
+		// 		")";
+		// 	await sequelize.query(sqlTemp, {
+		// 		type: sequelize.QueryTypes.INSERT,
+		// 	});
+
+		// 	return res.send({
+		// 		code: 0,
+		// 		message: "success",
+		// 	});
+		// }
+
 		const schema = Joi.object({
 			LAT_: Joi.number().required(),
 			LONG_: Joi.number().required(),
@@ -13,6 +35,7 @@ module.exports = {
 			SPEED: Joi.number().required(),
 			TGL: Joi.string().required(),
 			TGL_INPUT: Joi.string().required(),
+			TGL_SELESAI: Joi.string().required(),
 			SIGNAL: Joi.number().required(),
 			BATTERY: Joi.number().required(),
 			KET: Joi.string().required().allow(null, ""),
@@ -37,6 +60,7 @@ module.exports = {
 		const validate = schema.validate(req.body);
 
 		if (validate.error) {
+			console.log(validate.error.message);
 			return res.status(400).send({
 				code: 400,
 				message: validate.error.message,
@@ -132,7 +156,7 @@ module.exports = {
 			// 	")";
 			req.body.TGL = startOfDay(new Date(req.body.TGL)).toLocaleDateString();
 			const sql =
-				"INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,VISIT_ID,TYPE,ALTITUDE" +
+				"INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,TGL_SELESAI,SIGNAL,BATTERY,KET,VISIT_ID,TYPE,ALTITUDE" +
 				",ACCURATE,CUST,LOKASI,ID1_REF,MID1,MID1_REF,STATUS) values('" +
 				req.user.IDK +
 				"','" +
@@ -146,6 +170,8 @@ module.exports = {
 				"','" +
 				req.body.TGL +
 				"',GETDATE(),'" +
+				req.body.TGL_SELESAI +
+				"','" +
 				req.body.SIGNAL +
 				"','" +
 				req.body.BATTERY +

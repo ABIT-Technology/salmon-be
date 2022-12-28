@@ -14,6 +14,7 @@ module.exports = {
 			SPEED: Joi.number().required(),
 			TGL: Joi.string().required(),
 			TGL_INPUT: Joi.string().required(),
+			TGL_KELUAR: Joi.string().required(),
 			SIGNAL: Joi.number().required(),
 			BATTERY: Joi.number().required(),
 			KET: Joi.string().allow(null, ""),
@@ -119,7 +120,7 @@ module.exports = {
 
 			// save table header transaksi kegiatan
 			const sql =
-				"INSERT INTO SXT02C(ID1,IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,SIGNAL,BATTERY,KET,COY_ID,VISIT_ID,TYPE,ALTITUDE" +
+				"INSERT INTO SXT02C(ID1,IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,TGL_KELUAR,SIGNAL,BATTERY,KET,COY_ID,VISIT_ID,TYPE,ALTITUDE" +
 				",ACCURATE,LOKASI,ID3_REF,MID3,MID3_REF,STATUS) values(" +
 				(ID1_REF == null ? "NULL" : ID1_REF) +
 				",'" +
@@ -135,6 +136,8 @@ module.exports = {
 				"','" +
 				req.body.TGL +
 				"',GETDATE(),'" +
+				req.body.TGL_KELUAR +
+				"','" +
 				req.body.SIGNAL +
 				"','" +
 				req.body.BATTERY +
