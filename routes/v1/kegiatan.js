@@ -5,6 +5,8 @@ const { authJwt } = require("../../middlewares/jwt");
 
 router.get("/getKegiatan", authJwt, kegiatanController.getKegiatan);
 router.get("/getProduk", authJwt, kegiatanController.getProduk);
+router.get("/getProdukbyCust", authJwt, kegiatanController.getProdukbyCust);
+router.get("/getProdukbyWil", authJwt, kegiatanController.getProdukbyWil);
 router.get("/getCrops", authJwt, kegiatanController.getCrops);
 router.get("/getMedia", authJwt, kegiatanController.getMedia);
 router.get("/getCustomer", authJwt, kegiatanController.getCustomer.getAll);
