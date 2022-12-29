@@ -27,6 +27,25 @@ module.exports = {
 			fs.writeFileSync(path, base64Data, { encoding: "base64" });
 			return filename;
 		} catch (e) {
+			throw new Error(e.message);
+		}
+	},
+
+	uploadJSONFile: function (jsonData) {
+		try {
+			// to declare some path to store your converted image
+
+			const filename = uuidv4.v4();
+			const path = "./public/upload/tempFiles/" + filename + ".txt";
+			// const fileData = jsonData["string"];
+
+			fs.mkdirSync("./public/upload/tempFiles", { recursive: true });
+			// to convert base64 format into random filename
+			// const base64Data = fileData.replace(/^data:([A-Za-z-+/]+);base64,/, "");
+
+			fs.writeFileSync(path, jsonData);
+			return filename;
+		} catch (e) {
 			console.log(e);
 			throw new Error(e.message);
 		}
