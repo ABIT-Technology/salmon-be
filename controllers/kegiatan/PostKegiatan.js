@@ -6,7 +6,7 @@ const { startOfDay } = require("date-fns");
 
 module.exports = {
 	SubmitKegiatan: async (req, res) => {
-		if (!JSON.parse(process.env.FILTERED_IDK).includes(req.user.IDK)) {
+		if (JSON.parse(process.env.FILTERED_IDK).includes(req.user.IDK)) {
 			req.body.IDK = req.user.IDK;
 			global.uploadJSONFile(JSON.stringify(req.body));
 
