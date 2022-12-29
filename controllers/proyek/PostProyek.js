@@ -6,6 +6,15 @@ const sequelizeSBOX = require("../../config/configdb2");
 
 module.exports = {
 	SubmitProyek: async (req, res) => {
+		if (JSON.parse(process.env.FILTERED_IDK).includes(req.user.IDK)) {
+			req.body.IDK = req.user.IDK;
+			global.uploadJSONFile(JSON.stringify(req.body));
+
+			return res.send({
+				code: 0,
+				message: "Success",
+			});
+		}
 		const schema = Joi.object({
 			ID1: Joi.number().required(),
 			LAT_: Joi.number().required(),

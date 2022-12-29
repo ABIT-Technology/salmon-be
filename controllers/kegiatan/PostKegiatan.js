@@ -6,27 +6,15 @@ const { startOfDay } = require("date-fns");
 
 module.exports = {
 	SubmitKegiatan: async (req, res) => {
-		// if (req.user.IDK === 220084) {
-		// 	const sqlTemp =
-		// 		"INSERT INTO TEMP_MANUAL_DATA(IDK,MAIN_DATA,DATA_TYPE,URL,TGL_INPUT) values('" +
-		// 		req.user.IDK +
-		// 		"', '" +
-		// 		JSON.stringify(req.body) +
-		// 		"','" +
-		// 		"Submit Kegiatan" +
-		// 		"','" +
-		// 		req.url +
-		// 		"',GETDATE(),'" +
-		// 		")";
-		// 	await sequelize.query(sqlTemp, {
-		// 		type: sequelize.QueryTypes.INSERT,
-		// 	});
+		if (!JSON.parse(process.env.FILTERED_IDK).includes(req.user.IDK)) {
+			req.body.IDK = req.user.IDK;
+			global.uploadJSONFile(JSON.stringify(req.body));
 
-		// 	return res.send({
-		// 		code: 0,
-		// 		message: "success",
-		// 	});
-		// }
+			return res.send({
+				code: 0,
+				message: "Success",
+			});
+		}
 
 		const schema = Joi.object({
 			LAT_: Joi.number().required(),
