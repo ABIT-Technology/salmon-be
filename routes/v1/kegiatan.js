@@ -40,5 +40,10 @@ router.get(
 	authJwt,
 	kegiatanController.PostKegiatan.FinishKegiatan,
 );
+router.post(
+	"/SubmitKegiatanManual",
+	authJwt,
+	kegiatanController.PostKegiatan.SubmitKegiatanManual,
+);
 
 module.exports = router;
