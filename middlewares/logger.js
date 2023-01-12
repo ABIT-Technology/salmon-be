@@ -36,7 +36,7 @@ module.exports = {
 			}
 
 			const [results2, metadata2] = await sequelize.query(
-				`SELECT TOP 1 * FROM SBF01X WHERE APP = ${1} AND REJECT = ${0} 
+				`SELECT TOP 1 * FROM SBF01X WHERE VALID=${0} AND APP = ${1} AND REJECT = ${0} 
 				AND ACC_NO = '${ACC_NO}' AND SALMON2_ID = '${SALMON2_ID}'
 				ORDER BY ID1 DESC;`,
 			);
