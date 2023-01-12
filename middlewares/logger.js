@@ -36,13 +36,12 @@ module.exports = {
 			}
 
 			const [results2, metadata2] = await sequelize.query(
-				`SELECT TOP 1 * FROM SBF01X WHERE APP = ${1} AND REJECT = ${0} 
+				`SELECT TOP 1 * FROM SBF01X WHERE APP = ${1} AND VALID=${1} AND REJECT = ${0}
 				AND ACC_NO = '${ACC_NO}' AND SALMON2_ID = '${SALMON2_ID}'
 				ORDER BY ID1 DESC;`,
 			);
 
 			if (results2.length > 0) {
-				console.log(results2);
 				let logger = { ID1: results2[0].ID1 };
 				req.logger = logger;
 				return next();
