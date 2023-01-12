@@ -1,6 +1,7 @@
 const Joi = require("joi");
-const { sequelize, SXT05 } = require("../../models");
+const { SXT05 } = require("../../models");
 const sequelizeSBOX = require("../../config/configdb2");
+const sequelize = require("../../config/configdb");
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
@@ -44,19 +45,16 @@ module.exports = async (req, res) => {
 			});
 		}
 
-		// const attendance = await SXT05.findAll({
-		// 	where: { IDK: req.user.IDK },
-		// 	order: [["TGL_INPUT", "DESC"]],
-		// 	raw: true,
-		// });
+		const [results2, metadata2] = await sequelize.query(
+			`SELECT TOP 1 * FROM SXFSYS ORDER BY ID1 DESC;`,
+		);
 
-		// if (attendance.length < 0) {
-		// 	return res.status(409).send({
-		// 		code: 409,
-		// 		message: "Attendance not found",
-		// 	});
-		// }
-		// req.body.ID1_REF = attendance[0].ID1;
+		req.body.VISIT_ID = "97";
+
+		if (results2.length > 0) {
+			req.body.VISIT_ID = results2[0].DEF_ABSEN_OUT;
+		}
+
 		req.body.TYPE = 2;
 		req.body.IDK = req.user.IDK;
 
@@ -67,6 +65,7 @@ module.exports = async (req, res) => {
 			message: "Success",
 		});
 	} catch (err) {
+		console.log(err);
 		await t.rollback();
 		return res.status(400).send({
 			code: 400,

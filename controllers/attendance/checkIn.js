@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const { SXT05 } = require("../../models");
-const sequelize = require("../../config/configdb2");
+const sequelizeSBOX = require("../../config/configdb2");
+const sequelize = require("../../config/configdb");
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
@@ -32,7 +33,7 @@ module.exports = async (req, res) => {
 	}
 
 	try {
-		const [results, metadata] = await sequelize.query(
+		const [results, metadata] = await sequelizeSBOX.query(
 			`SELECT * FROM SBF01A WHERE AKTIF = ${1} AND IDK = '${req.user.IDK}';`,
 		);
 
@@ -41,6 +42,17 @@ module.exports = async (req, res) => {
 				code: 404,
 				message: "User not found",
 			});
+		}
+
+		const [results2, metadata2] = await sequelize.query(
+			`SELECT TOP 1 * FROM SXFSYS ORDER BY ID1 DESC;`,
+		);
+
+		req.body.VISIT_ID = "98";
+
+		if (results2.length > 0) {
+			console.log(results2);
+			req.body.VISIT_ID = results2[0].DEF_ABSEN_IN;
 		}
 
 		req.body.IDK = req.user.IDK;
@@ -53,6 +65,7 @@ module.exports = async (req, res) => {
 			message: "Success",
 		});
 	} catch (err) {
+		console.log(err);
 		return res.status(400).send({
 			code: 400,
 			message: err.message || "Server API Error",

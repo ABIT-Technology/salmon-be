@@ -22,6 +22,32 @@ module.exports = {
 				});
 			}
 			const { SALMON2_ID, ACC_NO } = req.body;
+			const [results, metadata] = await sequelize.query(
+				`SELECT TOP 1 * FROM SBF01X WHERE APP = ${0} AND REJECT = ${0} 
+				AND ACC_NO = '${ACC_NO}' AND SALMON2_ID = '${SALMON2_ID}'
+				ORDER BY ID1 DESC;`,
+			);
+
+			if (results.length > 0) {
+				return res.status(404).send({
+					code: 400,
+					message: "Sedang menunggu persetujuan admin",
+				});
+			}
+
+			const [results2, metadata2] = await sequelize.query(
+				`SELECT TOP 1 * FROM SBF01X WHERE APP = ${1} AND REJECT = ${0} 
+				AND ACC_NO = '${ACC_NO}' AND SALMON2_ID = '${SALMON2_ID}'
+				ORDER BY ID1 DESC;`,
+			);
+
+			if (results2.length > 0) {
+				console.log(results2);
+				let logger = { ID1: results2[0].ID1 };
+				req.logger = logger;
+				return next();
+			}
+
 			const sql = `INSERT INTO SBF01X(SALMON2_ID,ACC_NO) OUTPUT Inserted.ID1 VALUES('${SALMON2_ID}','${ACC_NO}');`;
 			let logger = await sequelize.query(sql, {
 				type: sequelize.QueryTypes.INSERT,
