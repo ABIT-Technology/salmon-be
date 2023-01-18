@@ -2,6 +2,7 @@ const Joi = require("joi");
 const { SXT05 } = require("../../models");
 const sequelizeSBOX = require("../../config/configdb2");
 const sequelize = require("../../config/configdb");
+const { format } = require("date-fns");
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
@@ -55,6 +56,7 @@ module.exports = async (req, res) => {
 			req.body.VISIT_ID = results2[0].DEF_ABSEN_OUT;
 		}
 
+		req.body.TGL = format(new Date(req.body.TGL), "yyyy-MM-dd'T'HH:mm:ss'Z'");
 		req.body.TYPE = 2;
 		req.body.IDK = req.user.IDK;
 
@@ -65,7 +67,6 @@ module.exports = async (req, res) => {
 			message: "Success",
 		});
 	} catch (err) {
-		console.log(err);
 		await t.rollback();
 		return res.status(400).send({
 			code: 400,

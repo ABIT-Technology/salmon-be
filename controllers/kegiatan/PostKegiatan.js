@@ -2,7 +2,7 @@ const Joi = require("joi");
 const sequelize = require("../../config/configdb");
 const global = require("../../config/global");
 const sequelizeSBOX = require("../../config/configdb2");
-const { startOfDay } = require("date-fns");
+const { startOfDay, format } = require("date-fns");
 
 module.exports = {
 	SubmitKegiatan: async (req, res) => {
@@ -48,7 +48,6 @@ module.exports = {
 		const validate = schema.validate(req.body);
 
 		if (validate.error) {
-			console.log(validate.error.message);
 			return res.status(400).send({
 				code: 400,
 				message: validate.error.message,
@@ -143,6 +142,10 @@ module.exports = {
 			// 	status +
 			// 	")";
 			req.body.TGL = startOfDay(new Date(req.body.TGL)).toLocaleDateString();
+			req.body.TGL_SELESAI = format(
+				new Date(req.body.TGL_SELESAI),
+				"yyyy-MM-dd'T'HH:mm:ss'Z'",
+			);
 			const sql =
 				"INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,TGL_SELESAI,SIGNAL,BATTERY,KET,VISIT_ID,TYPE,ALTITUDE" +
 				",ACCURATE,CUST,LOKASI,ID1_REF,MID1,MID1_REF,STATUS) values('" +
@@ -317,7 +320,6 @@ module.exports = {
 				global.getStandardResponse(0, "success : kegiatan saved", null),
 			);
 		} catch (err) {
-			console.log(err);
 			await t.rollback();
 			return res
 				.status(500)
@@ -749,7 +751,6 @@ module.exports = {
 		const validate = schema.validate(req.body);
 
 		if (validate.error) {
-			console.log(validate.error.message);
 			return res.status(400).send({
 				code: 400,
 				message: validate.error.message,
@@ -807,6 +808,10 @@ module.exports = {
 
 			// save table header transaksi kegiatan
 			req.body.TGL = startOfDay(new Date(req.body.TGL)).toLocaleDateString();
+			req.body.TGL_SELESAI = format(
+				new Date(req.body.TGL_SELESAI),
+				"yyyy-MM-dd'T'HH:mm:ss'Z'",
+			);
 			const sql =
 				"INSERT INTO SXT01A(IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,TGL_SELESAI,SIGNAL,BATTERY,KET,VISIT_ID,TYPE,ALTITUDE" +
 				",ACCURATE,CUST,LOKASI,ID1_REF,MID1,MID1_REF,STATUS) values('" +
