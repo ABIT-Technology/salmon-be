@@ -46,7 +46,6 @@ module.exports = {
 			fs.writeFileSync(path, jsonData);
 			return filename;
 		} catch (e) {
-			console.log(e);
 			throw new Error(e.message);
 		}
 	},

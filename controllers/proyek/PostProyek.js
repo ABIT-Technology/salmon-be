@@ -3,6 +3,7 @@ const sequelize = require("../../config/configdb");
 const global = require("../../config/global");
 const { SBF01A } = require("../../models");
 const sequelizeSBOX = require("../../config/configdb2");
+const { format, startOfDay } = require("date-fns");
 
 module.exports = {
 	SubmitProyek: async (req, res) => {
@@ -128,6 +129,11 @@ module.exports = {
 			}
 
 			// save table header transaksi kegiatan
+			req.body.TGL = startOfDay(new Date(req.body.TGL)).toLocaleDateString();
+			req.body.TGL_KELUAR = format(
+				new Date(req.body.TGL_KELUAR),
+				"yyyy-MM-dd'T'HH:mm:ss'Z'",
+			);
 			const sql =
 				"INSERT INTO SXT02C(ID1,IDK,LAT_,LONG_,COURSE,SPEED,TGL,TGL_INPUT,TGL_KELUAR,SIGNAL,BATTERY,KET,COY_ID,VISIT_ID,TYPE,ALTITUDE" +
 				",ACCURATE,LOKASI,ID3_REF,MID3,MID3_REF,STATUS) values(" +

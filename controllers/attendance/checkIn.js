@@ -2,6 +2,7 @@ const Joi = require("joi");
 const { SXT05 } = require("../../models");
 const sequelizeSBOX = require("../../config/configdb2");
 const sequelize = require("../../config/configdb");
+const { format } = require("date-fns");
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
@@ -51,21 +52,31 @@ module.exports = async (req, res) => {
 		req.body.VISIT_ID = "98";
 
 		if (results2.length > 0) {
-			console.log(results2);
 			req.body.VISIT_ID = results2[0].DEF_ABSEN_IN;
 		}
-
+		req.body.TGL = format(new Date(req.body.TGL), "yyyy-MM-dd'T'HH:mm:ss'Z'");
 		req.body.IDK = req.user.IDK;
 		req.body.TYPE = 1;
 
 		await SXT05.create(req.body);
+		// const sql = `INSERT INTO dbo.SXT05 (IDK, LAT_, LONG_, COURSE, SPEED, TGL, TGL_INPUT,
+		// 	SIGNAL, BATTERY, KET, VISIT_ID, TYPE, ALTITUDE, ACCURATE, CUST, LOKASI)
+		// VALUES(
+		// 	${req.user.IDK}, ${req.body.LAT_}, ${req.body.LONG_}, ${req.body.COURSE},
+		// 	${req.body.SPEED}, '${req.body.TGL}', GETDATE(), ${req.body.SIGNAL},
+		// 	${req.body.BATTERY}, '${req.body.KET}', ${req.body.VISIT_ID}, ${req.body.TYPE},
+		// 	${req.body.ALTITUDE}, ${req.body.ACCURATE}, ${null}, '${req.body.LOKASI}'
+		// );`;
+
+		// await sequelize.query(sql, {
+		// 	type: sequelize.QueryTypes.INSERT,
+		// });
 
 		return res.send({
 			code: 0,
 			message: "Success",
 		});
 	} catch (err) {
-		console.log(err);
 		return res.status(400).send({
 			code: 400,
 			message: err.message || "Server API Error",

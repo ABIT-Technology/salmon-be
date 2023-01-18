@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const sequelizeSBOX = require("../../config/configdb2");
 const sequelize = require("../../config/configdb");
+const { format } = require("date-fns");
 
 module.exports = async (req, res) => {
 	const schema = Joi.object({
@@ -37,6 +38,8 @@ module.exports = async (req, res) => {
 				message: "User not found",
 			});
 		}
+
+		req.body.TGL = format(new Date(req.body.TGL), "yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 		const sql = `INSERT INTO SXT04(IDK,LAT_,LONG_,COURSE,SPEED,TGL,SIGNAL,BATTERY,ALTITUDE,ACCURATE) 
 				values('${req.user.IDK}','${req.body.LAT_}','${req.body.LONG_}',
