@@ -141,7 +141,10 @@ module.exports = {
 			// 	"," +
 			// 	status +
 			// 	")";
-			req.body.TGL = startOfDay(new Date(req.body.TGL)).toLocaleDateString();
+			req.body.TGL = format(
+				startOfDay(new Date(req.body.TGL)),
+				"yyyy-MM-dd'T'HH:mm:ss'Z'",
+			);
 			req.body.TGL_SELESAI = format(
 				new Date(req.body.TGL_SELESAI),
 				"yyyy-MM-dd'T'HH:mm:ss'Z'",
@@ -320,6 +323,7 @@ module.exports = {
 				global.getStandardResponse(0, "success : kegiatan saved", null),
 			);
 		} catch (err) {
+			console.log("err", err.message);
 			await t.rollback();
 			return res
 				.status(500)
