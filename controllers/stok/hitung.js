@@ -112,7 +112,8 @@ module.exports = {
 						"','" +
 						BRG[i]["QTY"] +
 						"','" +
-						BRG[i]["STN"];
+						BRG[i]["STN"] +
+						"')";
 					await sequelize.query(sqlprod, {
 						type: sequelize.QueryTypes.INSERT,
 						transaction: t,
