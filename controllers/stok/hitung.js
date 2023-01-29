@@ -18,7 +18,7 @@ module.exports = {
 			TYPE: Joi.string().required(),
 			ALTITUDE: Joi.number().required(),
 			ACCURATE: Joi.number().required(),
-			LOKASI: Joi.string().required(),
+			LOKASI: Joi.string().allow(null, "").required(),
 			BRG: Joi.array().allow(null, ""),
 		}).options({
 			allowUnknown: false,
@@ -58,9 +58,7 @@ module.exports = {
 				req.body.LONG_ +
 				"','" +
 				req.body.COURSE +
-				"','" +
-				req.body.TGL_INPUT +
-				"','" +
+				"',GETDATE(),'" +
 				req.body.SIGNAL +
 				"','" +
 				req.body.BATTERY +
@@ -77,12 +75,14 @@ module.exports = {
 			let header = await sequelize
 				.query(sqlprod, {
 					type: sequelize.QueryTypes.INSERT,
+					transaction: t,
 				})
 				.then(function () {
 					const results2 = sequelize.query(
 						"SELECT TOP 1 * FROM SXT03A WHERE IDK = '" +
 							req.user.IDK +
 							"' ORDER BY ID1 DESC",
+						{ transaction: t },
 					);
 					if (results2 != null) {
 						return results2;
@@ -112,10 +112,10 @@ module.exports = {
 						"','" +
 						BRG[i]["QTY"] +
 						"','" +
-						BRG[i]["STN"] +
-						"',GETDATE())";
+						BRG[i]["STN"];
 					sequelize.query(sqlprod, {
 						type: sequelize.QueryTypes.INSERT,
+						transaction: t,
 					});
 				}
 			}
