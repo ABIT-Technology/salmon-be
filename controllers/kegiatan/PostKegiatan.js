@@ -141,10 +141,7 @@ module.exports = {
 			// 	"," +
 			// 	status +
 			// 	")";
-			req.body.TGL = format(
-				startOfDay(new Date(req.body.TGL)),
-				"yyyy-MM-dd'T'HH:mm:ss'Z'",
-			);
+			req.body.TGL = format(new Date(req.body.TGL), "yyyy-MM-dd'T'HH:mm:ss'Z'");
 			req.body.TGL_SELESAI = format(
 				new Date(req.body.TGL_SELESAI),
 				"yyyy-MM-dd'T'HH:mm:ss'Z'",
