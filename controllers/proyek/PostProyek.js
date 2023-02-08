@@ -129,10 +129,7 @@ module.exports = {
 			}
 
 			// save table header transaksi kegiatan
-			req.body.TGL = format(
-				startOfDay(new Date(req.body.TGL)),
-				"yyyy-MM-dd'T'HH:mm:ss'Z'",
-			);
+			req.body.TGL = format(new Date(req.body.TGL), "yyyy-MM-dd'T'HH:mm:ss'Z'");
 			req.body.TGL_KELUAR = format(
 				new Date(req.body.TGL_KELUAR),
 				"yyyy-MM-dd'T'HH:mm:ss'Z'",
