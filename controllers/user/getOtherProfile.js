@@ -18,8 +18,16 @@ module.exports = async (req, res) => {
 		const [results, metadata] = await sequelize.query(
 			`SELECT TOP 1 * 
 			FROM vwABF02A
-			WHERE AKTIF = 1 AND IDK = ${req.user.IDK};`,
+			WHERE AKTIF = 1 AND IDK = ${req.query.IDK};`,
 		);
+
+		if (results.length <= 0) {
+			return res.status(404).send({
+				code: 404,
+				message: "User not found",
+			});
+		}
+
 		res.json(global.getStandardResponse(0, "success", results[0]));
 	} catch (err) {
 		res.status(500).json(global.getStandardResponse(500, "API error", null));
