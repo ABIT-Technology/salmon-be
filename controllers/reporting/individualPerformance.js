@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
 			ON b.VISIT_ID = c.VISIT_ID
 			WHERE c.IDK = ${req.query.IDK} AND c.STATUS = 1 
 			AND CONVERT(date, c.TGL) BETWEEN '${yearNow}-${monthNow}-1' AND '${yearNow}-${monthNow}-${lastDate}'
-			GROUP BY a.GTYPE, a.KET, a.NILAI, c.IDK, c.IDK;`,
+			GROUP BY a.GTYPE, a.KET, a.NILAI, c.IDK;`,
 		);
 
 		const [results3, metadata3] = await sequelize.query(
