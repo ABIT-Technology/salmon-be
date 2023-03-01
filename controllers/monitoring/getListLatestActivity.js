@@ -58,11 +58,13 @@ module.exports = async (req, res) => {
 				ORDER BY c.TGL DESC;`,
 			);
 
-			dailyActivity.push({
-				ID: i,
-				DATE: new Date(yearNow, monthNow - 1, i),
-				DETAILS: results2[0] || null,
-			});
+			if (results2[0]) {
+				dailyActivity.push({
+					ID: i,
+					DATE: new Date(yearNow, monthNow - 1, i),
+					DETAILS: results2[0],
+				});
+			}
 		}
 
 		res.json(global.getStandardResponse(0, "success", dailyActivity));

@@ -146,7 +146,7 @@ module.exports = async (req, res) => {
 			let excess = 0;
 			let excess_score = 0;
 			if (percentage > 100) {
-				excess = percentage - 100;
+				excess = (percentage - 100) / 100;
 				score = 1;
 				excess_score = 1.5;
 			}
