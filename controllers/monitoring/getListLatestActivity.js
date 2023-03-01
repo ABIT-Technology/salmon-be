@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
 
 		let dailyActivity = [];
 		console.log(lastDate);
-		for (let i = 1; i <= lastDate; i++) {
+		for (let i = lastDate; i > 0; i--) {
 			const [results2, metadata2] = await sequelize.query(
 				`SELECT a.GTYPE, a.KET, a.NILAI, c.IDK, c.TGL, c.ID1, count(a.GTYPE) AS TOTAL_COUNT FROM sbox.dbo.SBF03A a
 				JOIN sbox.dbo.SBF03B b
