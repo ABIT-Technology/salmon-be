@@ -44,7 +44,6 @@ module.exports = async (req, res) => {
 		// var lastDate = 30;
 
 		let dailyActivity = [];
-		console.log(lastDate);
 		for (let i = lastDate; i > 0; i--) {
 			const [results2, metadata2] = await sequelize.query(
 				`SELECT a.GTYPE, a.KET, a.NILAI, c.IDK, c.TGL, c.ID1, count(a.GTYPE) AS TOTAL_COUNT FROM sbox.dbo.SBF03A a
@@ -61,7 +60,7 @@ module.exports = async (req, res) => {
 			if (results2[0]) {
 				dailyActivity.push({
 					ID: i,
-					DATE: new Date(yearNow, monthNow - 1, i),
+					DATE: results2[0].TGL,
 					DETAILS: results2[0],
 				});
 			}
@@ -69,7 +68,6 @@ module.exports = async (req, res) => {
 
 		res.json(global.getStandardResponse(0, "success", dailyActivity));
 	} catch (err) {
-		console.log(err);
 		res.status(500).json(global.getStandardResponse(500, "API error", null));
 	}
 };
