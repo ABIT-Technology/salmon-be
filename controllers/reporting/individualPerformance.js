@@ -84,6 +84,7 @@ module.exports = async (req, res) => {
 			ON a.ID1 = b.ID1
 			JOIN salmon2.dbo.SXT01A c
 			ON b.VISIT_ID = c.VISIT_ID
+			WHERE c.IDK = ${req.query.IDK} AND c.STATUS = 1 
 			WHERE CONVERT(date, c.TGL) BETWEEN '${yearNow}-${monthNow}-11' AND '${yearNow}-${monthNow}-20';`,
 		);
 
@@ -106,6 +107,7 @@ module.exports = async (req, res) => {
 			ON a.ID1 = b.ID1
 			JOIN salmon2.dbo.SXT01A c
 			ON b.VISIT_ID = c.VISIT_ID
+			WHERE c.IDK = ${req.query.IDK} AND c.STATUS = 1 
 			WHERE CONVERT(date, c.TGL) BETWEEN '${yearNow}-${monthNow}-21' AND '${yearNow}-${monthNow}-${lastDate}';`,
 		);
 
