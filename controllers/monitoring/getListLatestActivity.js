@@ -50,6 +50,22 @@ module.exports = async (req, res) => {
 				GROUP BY a.GTYPE, a.KET, a.NILAI, c.IDK;`,
 			);
 
+			const [results6, metadata6] = await sequelize.query(
+				`SELECT a.COY_ID, b.GTYPE, b.BK${k} FROM sbox.dbo.SBF05A a
+				JOIN sbox.dbo.SBF05B b
+				ON a.ID1 = b.ID1
+				WHERE a.COY_ID = 1 AND a.THN = ${yearNow};`,
+			);
+
+			for (let i = 0; i < results12.length; i++) {
+				results12[i].BUDGET = 0;
+				for (let j = 0; j < results6.length; j++) {
+					if (results12[i].GTYPE === results6[j].GTYPE) {
+						results12[i].BUDGET = results6[j][`BK${k}`];
+					}
+				}
+			}
+
 			for (let i = lastDate; i > 0; i--) {
 				const [results2, metadata2] = await sequelize.query(
 					`SELECT a.GTYPE, a.KET, a.NILAI, c.IDK, c.TGL, c.ID1 FROM sbox.dbo.SBF03A a
