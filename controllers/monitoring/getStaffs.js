@@ -33,10 +33,10 @@ module.exports = async (req, res) => {
 		const WIL2 = `AND a.WIL = ${req.query.WIL};`;
 
 		const [results2, metadata2] = await sequelizeSBOX.query(
-			`SELECT b.ID1, b.IDK, d.NAWIL, d.NAMA, d.NABAGIAN FROM	SBF01A a INNER JOIN	sbf01d b ON	a.ID1 = b.id1
+			`SELECT b.ID1, b.IDK, d.NAWIL, d.NAMA, d.NABAGIAN FROM SBF01A a INNER JOIN	sbf01d b ON	a.ID1 = b.id1
 			INNER JOIN	salmon2.dbo.vwabf02a c ON	a.IDK = c.idk
 			INNER JOIN	salmon2.dbo.vwabf02a d ON	b.IDK = d.idk
-			WHERE a.IDK = '${req.user.IDK}' AND c.WIL2 = '${req.query.WIL}'`,
+			WHERE a.IDK = '${req.user.IDK}' AND d.WIL2 = '${req.query.WIL}'`,
 		);
 
 		// const [results, metadata] = await sequelize.query(
