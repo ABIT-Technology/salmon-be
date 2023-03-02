@@ -33,41 +33,57 @@ module.exports = async (req, res) => {
 			});
 		}
 
-		const monthNow =
-			req.query.MONTH == 0
-				? new Date().getMonth() + 1
-				: parseInt(req.query.MONTH);
 		const yearNow = new Date().getFullYear();
-		var lastDate = new Date(yearNow, monthNow, 0).getDate();
-		// const monthNow = 1;
-		// const yearNow = 2023;
-		// var lastDate = 30;
 
 		let dailyActivity = [];
-		for (let i = lastDate; i > 0; i--) {
-			const [results2, metadata2] = await sequelize.query(
-				`SELECT a.GTYPE, a.KET, a.NILAI, c.IDK, c.TGL, c.ID1, count(a.GTYPE) AS TOTAL_COUNT FROM sbox.dbo.SBF03A a
+
+		for (let k = 12; k > 0; k--) {
+			const lastDate = new Date(yearNow, k, 0).getDate();
+			const [results12, metadata12] = await sequelize.query(
+				`SELECT a.GTYPE, a.KET, a.NILAI, c.IDK, count(a.GTYPE) AS TOTAL_COUNT FROM sbox.dbo.SBF03A a
 				JOIN sbox.dbo.SBF03B b
 				ON a.ID1 = b.ID1
 				JOIN salmon2.dbo.SXT01A c
 				ON b.VISIT_ID = c.VISIT_ID
 				WHERE c.IDK = ${req.query.IDK} AND c.STATUS = 1 
-				AND CONVERT(date, c.TGL) = '${yearNow}-${monthNow}-${i}'
-				GROUP BY a.GTYPE, a.KET, a.NILAI, c.IDK, C.TGL, c.ID1
-				ORDER BY c.TGL DESC;`,
+				AND CONVERT(date, c.TGL) BETWEEN '${yearNow}-${k}-1' AND '${yearNow}-${k}-${lastDate}'
+				GROUP BY a.GTYPE, a.KET, a.NILAI, c.IDK;`,
 			);
 
-			if (results2[0]) {
-				dailyActivity.push({
-					ID: i,
-					DATE: results2[0].TGL,
-					DETAILS: results2[0],
-				});
+			for (let i = lastDate; i > 0; i--) {
+				const [results2, metadata2] = await sequelize.query(
+					`SELECT a.GTYPE, a.KET, a.NILAI, c.IDK, c.TGL, c.ID1 FROM sbox.dbo.SBF03A a
+					JOIN sbox.dbo.SBF03B b
+					ON a.ID1 = b.ID1
+					JOIN salmon2.dbo.SXT01A c
+					ON b.VISIT_ID = c.VISIT_ID
+					WHERE c.IDK = ${req.query.IDK} AND c.STATUS = 1 
+					AND CONVERT(date, c.TGL) = '${yearNow}-${k}-${i}'
+					GROUP BY a.GTYPE, a.KET, a.NILAI, c.IDK, C.TGL, c.ID1
+					ORDER BY c.TGL DESC;`,
+				);
+
+				if (results2[0]) {
+					for (let j = 0; j < results12.length; j++) {
+						if (results2[0].GTYPE === results12[j].GTYPE) {
+							dailyActivity.push({
+								ID: `${k}-${j}`,
+								DATE: results2[0].TGL,
+								DETAILS: {
+									...results2[0],
+									BUDGET: results12[j].BUDGET,
+									TOTAL_COUNT: results12[j].TOTAL_COUNT,
+								},
+							});
+						}
+					}
+				}
 			}
 		}
 
 		res.json(global.getStandardResponse(0, "success", dailyActivity));
 	} catch (err) {
+		console.log(err);
 		res.status(500).json(global.getStandardResponse(500, "API error", null));
 	}
 };
