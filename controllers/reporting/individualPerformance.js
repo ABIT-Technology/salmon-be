@@ -85,7 +85,7 @@ module.exports = async (req, res) => {
 			JOIN salmon2.dbo.SXT01A c
 			ON b.VISIT_ID = c.VISIT_ID
 			WHERE c.IDK = ${req.query.IDK} AND c.STATUS = 1 
-			WHERE CONVERT(date, c.TGL) BETWEEN '${yearNow}-${monthNow}-11' AND '${yearNow}-${monthNow}-20';`,
+			AND CONVERT(date, c.TGL) BETWEEN '${yearNow}-${monthNow}-11' AND '${yearNow}-${monthNow}-20';`,
 		);
 
 		for (let i = 0; i < results2.length; i++) {
@@ -108,7 +108,7 @@ module.exports = async (req, res) => {
 			JOIN salmon2.dbo.SXT01A c
 			ON b.VISIT_ID = c.VISIT_ID
 			WHERE c.IDK = ${req.query.IDK} AND c.STATUS = 1 
-			WHERE CONVERT(date, c.TGL) BETWEEN '${yearNow}-${monthNow}-21' AND '${yearNow}-${monthNow}-${lastDate}';`,
+			AND CONVERT(date, c.TGL) BETWEEN '${yearNow}-${monthNow}-21' AND '${yearNow}-${monthNow}-${lastDate}';`,
 		);
 
 		for (let i = 0; i < results2.length; i++) {
@@ -172,6 +172,7 @@ module.exports = async (req, res) => {
 
 		res.json(global.getStandardResponse(0, "success", results2));
 	} catch (err) {
+		console.log(err);
 		res.status(500).json(global.getStandardResponse(500, "API error", null));
 	}
 };
