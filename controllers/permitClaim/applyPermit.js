@@ -145,7 +145,6 @@ module.exports = async (req, res) => {
 				});
 			}
 
-			console.log(2);
 			await t.commit();
 			res.json(global.getStandardResponse(0, "success", null));
 		} catch (error) {
