@@ -6,6 +6,8 @@ const monitoringController = require("./monitoring");
 const stokController = require("./stok");
 const notificationController = require("./notification");
 const reportingController = require("./reporting");
+const medClaimController = require("./medClaim");
+const permitClaimController = require("./permitClaim");
 
 module.exports = {
 	userController,
@@ -16,4 +18,6 @@ module.exports = {
 	stokController,
 	notificationController,
 	reportingController,
+	medClaimController,
+	permitClaimController,
 };
