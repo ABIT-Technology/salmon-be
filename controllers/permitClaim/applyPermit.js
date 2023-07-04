@@ -135,7 +135,7 @@ module.exports = async (req, res) => {
 			// 			);`;
 			for (let index = 0; index < req.body.DETAIL_CUTI.length; index++) {
 				const sql2 = `INSERT INTO AXT02B(ID1,CUTI_,TGL,WKT1,WKT2,HARI,KET,USER_INPUT)
-					values('${ID1}','${req.body.CUTI_}','${req.body.TGL}',
+					values('${ID1}','${req.body.CUTI_}','${req.body.DETAIL_CUTI[index].WKT1}',
 					'${req.body.DETAIL_CUTI[index].WKT1}','${req.body.DETAIL_CUTI[index].WKT2}',
 					'${req.body.DETAIL_CUTI[index].HARI}','${req.body.DETAIL_CUTI[index].KET}',
 					'${results2[0].NAMA}');`;
