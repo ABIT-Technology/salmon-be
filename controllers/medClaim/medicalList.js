@@ -6,16 +6,16 @@ const { format, addDays } = require("date-fns");
 
 module.exports = async (req, res) => {
 	try {
-		const [results1, metadata1] = await sequelizeSBOX.query(
-			`SELECT * FROM SBF01A WHERE IDK = ${req.user.IDK};`,
-		);
+		// const [results1, metadata1] = await sequelizeSBOX.query(
+		// 	`SELECT * FROM SBF01A WHERE IDK = ${req.user.IDK};`,
+		// );
 
-		if (results1.length <= 0) {
-			return res.status(404).send({
-				code: 404,
-				message: "User not found",
-			});
-		}
+		// if (results1.length <= 0) {
+		// 	return res.status(404).send({
+		// 		code: 404,
+		// 		message: "User not found",
+		// 	});
+		// }
 
 		const [results2, metadata2] = await sequelizeSalmon.query(
 			`SELECT * FROM vwabf13a WHERE AKTIF = 1;`,
@@ -23,6 +23,7 @@ module.exports = async (req, res) => {
 
 		res.json(global.getStandardResponse(0, "success", results2));
 	} catch (err) {
+		console.log(err.message);
 		res.status(500).json(global.getStandardResponse(500, "API error", null));
 	}
 };

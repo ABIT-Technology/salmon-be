@@ -8,16 +8,16 @@ module.exports = async (req, res) => {
 	const schema = Joi.object({
 		SALMON2_ID: Joi.string().required(),
 		ACC_NO: Joi.string().required(),
-		LAT_: Joi.number().required(),
-		LONG_: Joi.number().required(),
-		COURSE: Joi.number().required(),
-		SPEED: Joi.number().required(),
+		// LAT_: Joi.number().required(),
+		// LONG_: Joi.number().required(),
+		// COURSE: Joi.number().required(),
+		// SPEED: Joi.number().required(),
 		TGL: Joi.string().required(),
-		SIGNAL: Joi.number().required().allow(null, ""),
-		BATTERY: Joi.number().required(),
-		ALTITUDE: Joi.number().required(),
-		ACCURATE: Joi.number().required(),
-		LOKASI: Joi.string().required().allow(null, ""),
+		// SIGNAL: Joi.number().required().allow(null, ""),
+		// BATTERY: Joi.number().required(),
+		// ALTITUDE: Joi.number().required(),
+		// ACCURATE: Joi.number().required(),
+		// LOKASI: Joi.string().required().allow(null, ""),
 	}).options({
 		allowUnknown: false,
 	});
@@ -52,6 +52,8 @@ module.exports = async (req, res) => {
 			{ IDK: results[0].IDK },
 			JWT_ACCESS_TOKEN_SECRET,
 		);
+
+		console.log("access token => ", accessToken);
 
 		res.send({
 			code: 0,
